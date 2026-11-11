@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillViewport="true"
+    android:background="#121C14"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <LinearLayout
+        android:padding="24dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+        <!-- app logo placeholder -->
+        <ImageView
+            android:layout_marginBottom="24dp"
+            android:layout_marginTop="40dp"
+            android:contentDescription="App Logo"
+            android:src="@drawable/app_logo"
+            android:id="@+id/ivAppLogo"
+            android:layout_height="64dp"
+            android:layout_width="64dp" />
+
+        <!-- welcome title -->
+        <TextView
+            android:layout_marginBottom="6dp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:text="Welcome Back"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" />
+
+        <!-- subtitle text -->
+        <TextView
+            android:layout_marginBottom="36dp"
+            android:textColor="#8FA693"
+            android:textSize="13sp"
+            android:text="Your green health journey awaits"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" />
+
+        <!-- email input wrapper -->
+        <LinearLayout
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent">
+
+            <TextView
+                android:layout_marginBottom="8dp"
+                android:textColor="#8FA693"
+                android:textSize="13sp"
+                android:text="Email Address"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
+
+            <EditText
+                android:textSize="14sp"
+                android:inputType="textEmailAddress"
+                android:paddingHorizontal="16dp"
+                android:background="#1A261D"
+                android:textColorHint="#7A8C7E"
+                android:textColor="#FFFFFF"
+                android:hint="name@example.com"
+                android:id="@+id/etEmail"
+                android:layout_height="52dp"
+                android:layout_width="match_parent" />
+        </LinearLayout>
+
+        <!-- password input wrapper -->
+        <LinearLayout
+            android:layout_marginBottom="32dp"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent">
+
+            <TextView
+                android:layout_marginBottom="8dp"
+                android:textColor="#8FA693"
+                android:textSize="13sp"
+                android:text="Password"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
+
+            <RelativeLayout
+                android:paddingHorizontal="16dp"
+                android:background="#1A261D"
+                android:layout_height="52dp"
+                android:layout_width="match_parent">
+
+                <EditText
+                    android:paddingEnd="40dp"
+                    android:inputType="textPassword"
+                    android:textSize="14sp"
+                    android:textColorHint="#7A8C7E"
+                    android:textColor="#FFFFFF"
+                    android:hint="••••••••"
+                    android:background="@null"
+                    android:id="@+id/etPassword"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent" />
+
+                <!-- toggle eye icon -->
+                <ImageView
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:contentDescription="Toggle Password"
+                    android:src="@drawable/baseline_visibility_off_24"
+                    android:id="@+id/ivPasswordToggle"
+                    android:layout_height="22dp"
+                    android:layout_width="22dp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!-- login button -->
+        <Button
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="#10B981"
+            android:textColor="#121C14"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:text="Login"
+            android:id="@+id/btnLogin"
+            android:layout_height="52dp"
+            android:layout_width="match_parent" />
+
+        <!-- register link -->
+        <TextView
+            android:padding="8dp"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:textColor="#10B981"
+            android:text="Don't have an account? Register"
+            android:id="@+id/tvRegisterLink"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" />
+
+    </LinearLayout>
+</ScrollView>

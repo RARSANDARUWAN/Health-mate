@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121C14">
+
+    <!-- scrollable list view -->
+    <ScrollView
+        android:scrollbarSize="6dp"
+        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical"
+        android:fillViewport="true"
+        android:layout_above="@id/bottomNavBar"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <LinearLayout
+            android:padding="20dp"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent">
+
+            <!-- top header -->
+            <LinearLayout
+                android:layout_marginBottom="20dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
+
+                <ImageView
+                    android:contentDescription="Back"
+                    android:src="@drawable/baseline_arrow_back_24"
+                    android:id="@+id/btnBack"
+                    android:layout_height="24dp"
+                    android:layout_width="24dp" />
+
+                <TextView
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:text="Health History"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:contentDescription="Profile Icon"
+                    android:src="@drawable/baseline_person_pin_24"
+                    android:id="@+id/btnTopProfile"
+                    android:layout_height="24dp"
+                    android:layout_width="24dp" />
+            </LinearLayout>
+
+            <!-- search wrapper -->
+            <LinearLayout
+                android:layout_marginBottom="16dp"
+                android:paddingHorizontal="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:background="#1A261D"
+                android:layout_height="48dp"
+                android:layout_width="match_parent">
+
+                <ImageView
+                    android:contentDescription="Search"
+                    android:src="@drawable/baseline_search_24"
+                    android:layout_marginEnd="12dp"
+                    android:layout_height="20dp"
+                    android:layout_width="20dp" />
+
+                <EditText
+                    android:inputType="text"
+                    android:textSize="13sp"
+                    android:textColorHint="#7A8C7E"
+                    android:textColor="#FFFFFF"
+                    android:hint="Search by date, e.g., 2026-10-29"
+                    android:background="@null"
+                    android:id="@+id/etSearchDate"
+                    android:layout_height="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:contentDescription="Calendar"
+                    android:src="@drawable/baseline_calendar_today_24"
+                    android:layout_height="20dp"
+                    android:layout_width="20dp" />
+            </LinearLayout>
+
+            <!-- filter buttons -->
+            <LinearLayout
+                android:layout_marginBottom="20dp"
+                android:weightSum="2"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
+
+                <Button
+                    android:layout_marginEnd="6dp"
+                    android:backgroundTint="#10B981"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    android:text="All Records"
+                    android:id="@+id/btnAllRecords"
+                    android:layout_height="42dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:layout_marginStart="6dp"
+                    android:backgroundTint="#1A261D"
+                    android:textColor="#8FA693"
+                    android:textSize="12sp"
+                    android:text="Active Days (6k+ steps)"
+                    android:id="@+id/btnActiveDays"
+                    android:layout_height="42dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <!-- stats summary block -->
+            <LinearLayout
+                android:gravity="center"
+                android:weightSum="3"
+                android:layout_marginBottom="24dp"
+                android:padding="16dp"
+                android:background="#1A261D"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1">
+                    <TextView
+                        android:layout_marginBottom="4dp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:text="Avg Water"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content" />
+                    <TextView
+                        android:textColor="#8CB89B"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:text="1829 ml"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1">
+                    <TextView
+                        android:layout_marginBottom="4dp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:text="Avg Steps"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content" />
+                    <TextView
+                        android:textColor="#8CB89B"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:text="7,100"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1">
+                    <TextView
+                        android:layout_marginBottom="4dp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:text="Avg Burned"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content" />
+                    <TextView
+                        android:textColor="#D4A373"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:text="471 kcal"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- history log item 1 -->
+            <LinearLayout
+                android:layout_marginBottom="14dp"
+                android:padding="16dp"
+                android:background="#162218"
+                android:orientation="vertical"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
+
+                <LinearLayout
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent">
+
+                    <ImageView
+                        android:contentDescription="Date"
+                        android:src="@drawable/baseline_calendar_today_24"
+                        android:layout_marginEnd="8dp"
+                        android:layout_height="16dp"
+                        android:layout_width="16dp" />
+
+                    <TextView
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:text="October 29, 2026"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:textColor="#10B981"
+                        android:textStyle="bold"
+                        android:textSize="11sp"
+                        android:text="✓ Goal Met"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:weightSum="3"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent">
+
+                    <!-- water sub-item -->
+                    <LinearLayout
+                        android:layout_marginEnd="4dp"
+                        android:padding="10dp"
+                        android:background="#1A261D"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1">
+                        <LinearLayout
+                            android:layout_marginBottom="4dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content">
+                            <ImageView android:contentDescription="Water" android:src="@drawable/baseline_water_drop_24" android:layout_marginEnd="4dp" android:layout_height="12dp" android:layout_width="12dp"/>
+                            <TextView android:textColor="#8FA693" android:textSize="11sp" android:text="Water" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                        <TextView android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="13sp" android:text="1,800 ml" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                    </LinearLayout>
+
+                    <!-- steps sub-item -->
+                    <LinearLayout
+                        android:layout_marginHorizontal="2dp"
+                        android:padding="10dp"
+                        android:background="#1A261D"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1">
+                        <LinearLayout
+                            android:layout_marginBottom="4dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content">
+                            <ImageView android:contentDescription="Steps" android:src="@drawable/baseline_directions_run_24" android:layout_marginEnd="4dp" android:layout_height="12dp" android:layout_width="12dp"/>
+                            <TextView android:textColor="#8FA693" android:textSize="11sp" android:text="Steps" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                        <TextView android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="13sp" android:text="6,400" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                    </LinearLayout>
+
+                    <!-- burned sub-item -->
+                    <LinearLayout
+                        android:layout_marginStart="4dp"
+                        android:padding="10dp"
+                        android:background="#1A261D"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1">
+                        <LinearLayout
+                            android:layout_marginBottom="4dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content">
+                            <ImageView android:contentDescription="Burned" android:src="@drawable/baseline_local_fire_department_24" android:layout_marginEnd="4dp" android:layout_height="12dp" android:layout_width="12dp"/>
+                            <TextView android:textColor="#8FA693" android:textSize="11sp" android:text="Burned" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                        <TextView android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="13sp" android:text="420 kcal" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- history log item 2 -->
+            <LinearLayout
+                android:layout_marginBottom="14dp"
+                android:padding="16dp"
+                android:background="#162218"
+                android:orientation="vertical"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
+
+                <LinearLayout
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent">
+
+                    <ImageView
+                        android:contentDescription="Date"
+                        android:src="@drawable/baseline_calendar_today_24"
+                        android:layout_marginEnd="8dp"
+                        android:layout_height="16dp"
+                        android:layout_width="16dp" />
+
+                    <TextView
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:text="October 28, 2026"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:textColor="#10B981"
+                        android:textStyle="bold"
+                        android:textSize="11sp"
+                        android:text="✓ Goal Met"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:weightSum="3"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent">
+
+                    <LinearLayout
+                        android:layout_marginEnd="4dp"
+                        android:padding="10dp"
+                        android:background="#1A261D"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1">
+                        <LinearLayout android:layout_marginBottom="4dp" android:gravity="center_vertical" android:orientation="horizontal" android:layout_height="wrap_content" android:layout_width="wrap_content">
+                            <ImageView android:contentDescription="Water" android:src="@drawable/baseline_water_drop_24" android:layout_marginEnd="4dp" android:layout_height="12dp" android:layout_width="12dp"/>
+                            <TextView android:textColor="#8FA693" android:textSize="11sp" android:text="Water" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                        <TextView android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="13sp" android:text="1,500 ml" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_marginHorizontal="2dp"
+                        android:padding="10dp"
+                        android:background="#1A261D"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1">
+                        <LinearLayout android:layout_marginBottom="4dp" android:gravity="center_vertical" android:orientation="horizontal" android:layout_height="wrap_content" android:layout_width="wrap_content">
+                            <ImageView android:contentDescription="Steps" android:src="@drawable/baseline_directions_run_24" android:layout_marginEnd="4dp" android:layout_height="12dp" android:layout_width="12dp"/>
+                            <TextView android:textColor="#8FA693" android:textSize="11sp" android:text="Steps" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                        <TextView android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="13sp" android:text="4,000" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_marginStart="4dp"
+                        android:padding="10dp"
+                        android:background="#1A261D"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1">
+                        <LinearLayout android:layout_marginBottom="4dp" android:gravity="center_vertical" android:orientation="horizontal" android:layout_height="wrap_content" android:layout_width="wrap_content">
+                            <ImageView android:contentDescription="Burned" android:src="@drawable/baseline_local_fire_department_24" android:layout_marginEnd="4dp" android:layout_height="12dp" android:layout_width="12dp"/>
+                            <TextView android:textColor="#8FA693" android:textSize="11sp" android:text="Burned" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                        <TextView android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="13sp" android:text="350 kcal" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- bottom navigation bar with history active -->
+    <LinearLayout
+        android:paddingTop="8dp"
+        android:weightSum="3"
+        android:orientation="horizontal"
+        android:background="#162218"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/bottomNavBar"
+        android:layout_height="60dp"
+        android:layout_width="match_parent">
+
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="vertical"
+            android:id="@+id/navHome"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1">
+            <ImageView
+                android:contentDescription="Home"
+                android:src="@drawable/baseline_home_24"
+                android:layout_height="22dp"
+                android:layout_width="22dp" />
+            <TextView
+                android:textColor="#7A8C7E"
+                android:textSize="11sp"
+                android:text="Home"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1">
+            <ImageView
+                android:contentDescription="History"
+                android:src="@drawable/baseline_history_24"
+                android:layout_height="22dp"
+                android:layout_width="22dp" />
+            <TextView
+                android:textStyle="bold"
+                android:textColor="#10B981"
+                android:textSize="11sp"
+                android:text="History"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="vertical"
+            android:id="@+id/navProfile"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1">
+            <ImageView
+                android:contentDescription="Profile"
+                android:src="@drawable/baseline_person_24"
+                android:layout_height="22dp"
+                android:layout_width="22dp" />
+            <TextView
+                android:textColor="#7A8C7E"
+                android:textSize="11sp"
+                android:text="Profile"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
