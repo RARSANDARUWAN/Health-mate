@@ -11,7 +11,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "health_mate.db";
     private static final int DATABASE_VERSION = 5;
 
-    // Users table and columns
+    // table user schemas
     public static final String TABLE_USERS = "users";
     public static final String COL_USER_ID = "u_id";
     public static final String COL_FULL_NAME = "full_name";
@@ -19,7 +19,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_EMAIL = "email";
     public static final String COL_PASSWORD = "password";
 
-    // Health records table and columns
+    // table health records schemas
     public static final String TABLE_RECORDS = "health_records";
     public static final String COL_REC_ID = "id";
     public static final String COL_REC_USER_ID = "u_id";
@@ -34,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Create users table
+        // create user accounts table
         String createUsersQuery = "CREATE TABLE " + TABLE_USERS + " ("
                 + COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COL_FULL_NAME + " TEXT, "
@@ -43,7 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_PASSWORD + " TEXT)";
         db.execSQL(createUsersQuery);
 
-        // Create health records table
+        // create health metrics tracking table with foreign key reference
         String createRecordsQuery = "CREATE TABLE " + TABLE_RECORDS + " ("
                 + COL_REC_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COL_REC_USER_ID + " INTEGER, "
@@ -54,20 +54,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "FOREIGN KEY(" + COL_REC_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COL_USER_ID + "))";
         db.execSQL(createRecordsQuery);
 
-        // Add default test data
+        // seed initial mock data for testing and chart rendering
         addDummyUser(db);
         addDummyRecords(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop old tables if database version updates
+        // drop old tables and recreate on schema version change
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECORDS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         onCreate(db);
     }
 
-    // Insert a default user for testing
     private void addDummyUser(SQLiteDatabase db) {
         ContentValues values = new ContentValues();
         values.put(COL_FULL_NAME, "RAR Sandaruwan");
@@ -77,8 +76,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_USERS, null, values);
     }
 
-    // Insert 7 days  records
     private void addDummyRecords(SQLiteDatabase db) {
+        // mock timeline dates for dashboard charts and history logs
         String[] dates = {
                 "2026-06-01", "2026-06-02", "2026-06-03",
                 "2026-06-04", "2026-06-05", "2026-06-06", "2026-06-07"
@@ -87,6 +86,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int[] calories = {350, 390, 450, 300, 480, 410, 430};
         int[] water = {1800, 2000, 2200, 1500, 2500, 2100, 2000};
 
+        // insert 7 days of sample metrics linked to default user id 1
         for (int i = 0; i < dates.length; i++) {
             ContentValues values = new ContentValues();
             values.put(COL_REC_USER_ID, 1);
@@ -98,7 +98,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    // Save a new user account
     public boolean registerUser(String fullName, int age, String email, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -111,7 +110,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result != -1;
     }
 
-    // Verify user login details
     public boolean checkUserLogin(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_USERS + " WHERE " + COL_EMAIL + " = ? AND " + COL_PASSWORD + " = ?";
@@ -122,10 +120,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return isValid;
     }
 
-    // Fetch all health records sorted by date
     public Cursor getAllHealthRecords() {
         SQLiteDatabase db = this.getReadableDatabase();
+        // fetch all records sorted by latest date first for history view
         String query = "SELECT * FROM " + TABLE_RECORDS + " ORDER BY " + COL_DATE + " DESC";
+        return db.rawQuery(query, null);
+    }
+
+    public Cursor getWeeklyChartData() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        // fetch chronological sequence of last 7 days data for dashboard bar charts
+        String query = "SELECT * FROM " + TABLE_RECORDS + " ORDER BY " + COL_DATE + " ASC LIMIT 7";
         return db.rawQuery(query, null);
     }
 }

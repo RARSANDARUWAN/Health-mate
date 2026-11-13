@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#121C14">
 
-    <!-- main scroll area -->
+    <!-- Main scroll container -->
     <ScrollView
         android:fillViewport="true"
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- top bar -->
+            <!-- Top header bar -->
             <LinearLayout
                 android:layout_marginBottom="24dp"
                 android:gravity="center_vertical"
@@ -58,7 +58,7 @@
                     android:layout_height="24dp" />
             </LinearLayout>
 
-            <!-- summary title header -->
+            <!-- Summary section title -->
             <LinearLayout
                 android:layout_marginBottom="16dp"
                 android:gravity="center_vertical"
@@ -101,7 +101,7 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <!-- water card -->
+            <!-- Water intake card -->
             <LinearLayout
                 android:layout_marginBottom="12dp"
                 android:paddingHorizontal="16dp"
@@ -143,7 +143,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- steps card -->
+            <!-- Steps walked card -->
             <LinearLayout
                 android:layout_marginBottom="12dp"
                 android:paddingHorizontal="16dp"
@@ -185,7 +185,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- calories card -->
+            <!-- Calories burned card -->
             <LinearLayout
                 android:layout_marginBottom="24dp"
                 android:paddingHorizontal="16dp"
@@ -227,7 +227,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- history chart box -->
+            <!-- Weekly chart section -->
             <LinearLayout
                 android:padding="16dp"
                 android:background="#1A261D"
@@ -262,7 +262,7 @@
                         android:layout_height="wrap_content" />
                 </LinearLayout>
 
-                <!-- bars layout -->
+                <!-- Dynamic 7-day bars layout -->
                 <LinearLayout
                     android:weightSum="7"
                     android:orientation="horizontal"
@@ -270,7 +270,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="140dp">
 
-                    <!-- mon -->
+                    <!-- Bar 1 -->
                     <LinearLayout
                         android:orientation="vertical"
                         android:gravity="bottom|center"
@@ -279,6 +279,7 @@
                         android:layout_weight="1">
 
                         <TextView
+                            android:id="@+id/tvVal1"
                             android:layout_marginBottom="4px"
                             android:textColor="#8FA693"
                             android:textSize="9sp"
@@ -288,20 +289,21 @@
 
                         <View
                             android:background="#8CB89B"
-                            android:id="@+id/barMon"
+                            android:id="@+id/bar1"
                             android:layout_width="16dp"
                             android:layout_height="20dp" />
 
                         <TextView
+                            android:id="@+id/tvDay1"
                             android:layout_marginTop="6dp"
                             android:textColor="#8FA693"
-                            android:textSize="11sp"
-                            android:text="Mon"
+                            android:textSize="10sp"
+                            android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
 
-                    <!-- tue -->
+                    <!-- Bar 2 -->
                     <LinearLayout
                         android:orientation="vertical"
                         android:gravity="bottom|center"
@@ -310,6 +312,7 @@
                         android:layout_weight="1">
 
                         <TextView
+                            android:id="@+id/tvVal2"
                             android:layout_marginBottom="4px"
                             android:textColor="#8FA693"
                             android:textSize="9sp"
@@ -319,20 +322,21 @@
 
                         <View
                             android:background="#8CB89B"
-                            android:id="@+id/barTue"
+                            android:id="@+id/bar2"
                             android:layout_width="16dp"
                             android:layout_height="20dp" />
 
                         <TextView
+                            android:id="@+id/tvDay2"
                             android:layout_marginTop="6dp"
                             android:textColor="#8FA693"
-                            android:textSize="11sp"
-                            android:text="Tue"
+                            android:textSize="10sp"
+                            android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
 
-                    <!-- wed -->
+                    <!-- Bar 3 -->
                     <LinearLayout
                         android:orientation="vertical"
                         android:gravity="bottom|center"
@@ -341,6 +345,7 @@
                         android:layout_weight="1">
 
                         <TextView
+                            android:id="@+id/tvVal3"
                             android:layout_marginBottom="4px"
                             android:textColor="#8FA693"
                             android:textSize="9sp"
@@ -350,20 +355,21 @@
 
                         <View
                             android:background="#8CB89B"
-                            android:id="@+id/barWed"
+                            android:id="@+id/bar3"
                             android:layout_width="16dp"
                             android:layout_height="20dp" />
 
                         <TextView
+                            android:id="@+id/tvDay3"
                             android:layout_marginTop="6dp"
                             android:textColor="#8FA693"
-                            android:textSize="11sp"
-                            android:text="Wed"
+                            android:textSize="10sp"
+                            android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
 
-                    <!-- thu -->
+                    <!-- Bar 4 -->
                     <LinearLayout
                         android:orientation="vertical"
                         android:gravity="bottom|center"
@@ -372,6 +378,106 @@
                         android:layout_weight="1">
 
                         <TextView
+                            android:id="@+id/tvVal4"
+                            android:layout_marginBottom="4px"
+                            android:textColor="#8FA693"
+                            android:textSize="9sp"
+                            android:text="0"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <View
+                            android:background="#8CB89B"
+                            android:id="@+id/bar4"
+                            android:layout_width="16dp"
+                            android:layout_height="20dp" />
+
+                        <TextView
+                            android:id="@+id/tvDay4"
+                            android:layout_marginTop="6dp"
+                            android:textColor="#8FA693"
+                            android:textSize="10sp"
+                            android:text="--"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <!-- Bar 5 -->
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="bottom|center"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/tvVal5"
+                            android:layout_marginBottom="4px"
+                            android:textColor="#8FA693"
+                            android:textSize="9sp"
+                            android:text="0"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <View
+                            android:background="#8CB89B"
+                            android:id="@+id/bar5"
+                            android:layout_width="16dp"
+                            android:layout_height="20dp" />
+
+                        <TextView
+                            android:id="@+id/tvDay5"
+                            android:layout_marginTop="6dp"
+                            android:textColor="#8FA693"
+                            android:textSize="10sp"
+                            android:text="--"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <!-- Bar 6 -->
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="bottom|center"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/tvVal6"
+                            android:layout_marginBottom="4px"
+                            android:textColor="#8FA693"
+                            android:textSize="9sp"
+                            android:text="0"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <View
+                            android:background="#8CB89B"
+                            android:id="@+id/bar6"
+                            android:layout_width="16dp"
+                            android:layout_height="20dp" />
+
+                        <TextView
+                            android:id="@+id/tvDay6"
+                            android:layout_marginTop="6dp"
+                            android:textColor="#8FA693"
+                            android:textSize="10sp"
+                            android:text="--"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <!-- Bar 7 (Today / Most recent) -->
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="bottom|center"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/tvVal7"
                             android:layout_marginBottom="4px"
                             android:textColor="#4CAF50"
                             android:textSize="9sp"
@@ -381,109 +487,17 @@
 
                         <View
                             android:background="#2E7D32"
-                            android:id="@+id/barThu"
+                            android:id="@+id/bar7"
                             android:layout_width="16dp"
                             android:layout_height="20dp" />
 
                         <TextView
+                            android:id="@+id/tvDay7"
                             android:textStyle="bold"
                             android:layout_marginTop="6dp"
                             android:textColor="#FFFFFF"
-                            android:textSize="11sp"
-                            android:text="Thu"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-
-                    <!-- fri -->
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:gravity="bottom|center"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_marginBottom="4px"
-                            android:textColor="#8FA693"
-                            android:textSize="9sp"
-                            android:text="0"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                        <View
-                            android:background="#8CB89B"
-                            android:id="@+id/barFri"
-                            android:layout_width="16dp"
-                            android:layout_height="20dp" />
-
-                        <TextView
-                            android:layout_marginTop="6dp"
-                            android:textColor="#8FA693"
-                            android:textSize="11sp"
-                            android:text="Fri"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-
-                    <!-- sat -->
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:gravity="bottom|center"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_marginBottom="4px"
-                            android:textColor="#8FA693"
-                            android:textSize="9sp"
-                            android:text="0"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                        <View
-                            android:background="#8CB89B"
-                            android:id="@+id/barSat"
-                            android:layout_width="16dp"
-                            android:layout_height="20dp" />
-
-                        <TextView
-                            android:layout_marginTop="6dp"
-                            android:textColor="#8FA693"
-                            android:textSize="11sp"
-                            android:text="Sat"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-
-                    <!-- sun -->
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:gravity="bottom|center"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_marginBottom="4px"
-                            android:textColor="#8FA693"
-                            android:textSize="9sp"
-                            android:text="0"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                        <View
-                            android:background="#8CB89B"
-                            android:id="@+id/barSun"
-                            android:layout_width="16dp"
-                            android:layout_height="20dp" />
-
-                        <TextView
-                            android:layout_marginTop="6dp"
-                            android:textColor="#8FA693"
-                            android:textSize="11sp"
-                            android:text="Sun"
+                            android:textSize="10sp"
+                            android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
@@ -491,7 +505,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- action buttons -->
+            <!-- Quick action buttons -->
             <Button
                 android:layout_marginBottom="12dp"
                 android:backgroundTint="#10B981"
@@ -535,7 +549,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- bottom bar -->
+    <!-- Bottom navigation bar -->
     <LinearLayout
         android:paddingTop="8dp"
         android:weightSum="3"
