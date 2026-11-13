@@ -12,10 +12,9 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules">
 
-        <!-- main launcher activity -->
+        <!-- login screen entry point -->
         <activity
-            android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,10 +22,31 @@
             </intent-filter>
         </activity>
 
-        <!-- app screens -->
-        <activity android:name=".HistoryActivity" android:exported="false" />
-        <activity android:name=".ProfileActivity" android:exported="false" />
-        <activity android:name=".AddRecordActivity" android:exported="false" />
+        <!-- user registration screen -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+
+        <!-- main dashboard screen -->
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+
+        <!-- history log viewer screen -->
+        <activity
+            android:name=".HistoryActivity"
+            android:exported="false" />
+
+        <!-- user profile details screen -->
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+
+        <!-- add new health record screen -->
+        <activity
+            android:name=".AddRecordActivity"
+            android:exported="false" />
 
     </application>
 
