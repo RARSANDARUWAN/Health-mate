@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_marginBottom="12dp"
+    android:padding="16dp"
+    android:background="#1A261D"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Top row: Date and Logged status label -->
+    <LinearLayout
+        android:layout_marginBottom="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvLogDate"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:text="Date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            android:textStyle="bold"
+            android:textColor="#10B981"
+            android:textSize="12sp"
+            android:text="Logged"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- Bottom row: Metrics icons and values (Water, Steps, Calories) -->
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Water metric item -->
+        <LinearLayout
+            android:layout_marginEnd="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_marginEnd="4dp"
+                android:contentDescription="Water"
+                android:src="@drawable/baseline_water_drop_24"
+                android:layout_width="14dp"
+                android:layout_height="14dp" />
+            <TextView
+                android:id="@+id/tvLogWater"
+                android:textColor="#8CB89B"
+                android:textSize="12sp"
+                android:text="0 ml"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- Steps metric item -->
+        <LinearLayout
+            android:layout_marginEnd="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_marginEnd="4dp"
+                android:contentDescription="Steps"
+                android:src="@drawable/baseline_directions_run_24"
+                android:layout_width="14dp"
+                android:layout_height="14dp" />
+            <TextView
+                android:id="@+id/tvLogSteps"
+                android:textColor="#8CB89B"
+                android:textSize="12sp"
+                android:text="0 steps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- Calories metric item -->
+        <LinearLayout
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_marginEnd="4dp"
+                android:contentDescription="Calories"
+                android:src="@drawable/baseline_local_fire_department_24"
+                android:layout_width="14dp"
+                android:layout_height="14dp" />
+            <TextView
+                android:id="@+id/tvLogCalories"
+                android:textColor="#D4A373"
+                android:textSize="12sp"
+                android:text="0 kcal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
