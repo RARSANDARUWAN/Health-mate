@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#121C14">
 
-    <!-- main scroll layout -->
+    <!-- main scrollable container view -->
     <ScrollView
         android:fillViewport="true"
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- top header -->
+            <!-- top header navigation bar layout -->
             <LinearLayout
                 android:layout_marginBottom="24dp"
                 android:gravity="center_vertical"
@@ -42,7 +42,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
-                <!-- profile image button -->
                 <ImageView
                     android:layout_marginEnd="16dp"
                     android:contentDescription="Profile"
@@ -52,7 +51,7 @@
                     android:layout_height="24dp" />
             </LinearLayout>
 
-            <!-- date card -->
+            <!-- date picker selector card -->
             <LinearLayout
                 android:layout_marginBottom="20dp"
                 android:paddingHorizontal="16dp"
@@ -96,7 +95,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- water section title -->
+            <!-- water input section title label -->
             <LinearLayout
                 android:layout_marginBottom="8dp"
                 android:gravity="center_vertical"
@@ -120,6 +119,7 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
+            <!-- water quantity input text wrapper -->
             <RelativeLayout
                 android:paddingHorizontal="16dp"
                 android:background="#1A261D"
@@ -149,7 +149,7 @@
                     android:layout_height="wrap_content" />
             </RelativeLayout>
 
-            <!-- steps section title -->
+            <!-- steps input section title label -->
             <LinearLayout
                 android:layout_marginBottom="8dp"
                 android:gravity="center_vertical"
@@ -173,6 +173,7 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
+            <!-- steps count input text wrapper -->
             <RelativeLayout
                 android:paddingHorizontal="16dp"
                 android:background="#1A261D"
@@ -202,7 +203,7 @@
                     android:layout_height="wrap_content" />
             </RelativeLayout>
 
-            <!-- calories section title -->
+            <!-- calories section title label -->
             <LinearLayout
                 android:layout_marginBottom="8dp"
                 android:gravity="center_vertical"
@@ -226,6 +227,7 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
+            <!-- calories burned input text wrapper -->
             <RelativeLayout
                 android:paddingHorizontal="16dp"
                 android:background="#1A261D"
@@ -255,7 +257,7 @@
                     android:layout_height="wrap_content" />
             </RelativeLayout>
 
-            <!-- save button -->
+            <!-- record submission action button -->
             <Button
                 android:layout_marginBottom="24dp"
                 android:backgroundTint="#10B981"
@@ -267,7 +269,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="52dp" />
 
-            <!-- recent logs header -->
+            <!-- recent logs container header title -->
             <TextView
                 android:layout_marginBottom="12dp"
                 android:textStyle="bold"
@@ -277,112 +279,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- log card item -->
+            <!-- dynamic layout container for inflated history log items -->
             <LinearLayout
-                android:layout_marginBottom="16dp"
-                android:padding="16dp"
-                android:background="#1A261D"
+                android:id="@+id/recentLogsContainer"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_marginBottom="12dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:textStyle="bold"
-                        android:textColor="#FFFFFF"
-                        android:textSize="13sp"
-                        android:text="Yesterday, Oct 28, 2026"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:textStyle="bold"
-                        android:textColor="#10B981"
-                        android:textSize="12sp"
-                        android:text="Logged"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <LinearLayout
-                        android:layout_marginEnd="16dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <ImageView
-                            android:layout_marginEnd="4dp"
-                            android:contentDescription="Water"
-                            android:src="@drawable/baseline_water_drop_24"
-                            android:layout_width="14dp"
-                            android:layout_height="14dp" />
-                        <TextView
-                            android:textColor="#8CB89B"
-                            android:textSize="12sp"
-                            android:text="1200 ml"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_marginEnd="16dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <ImageView
-                            android:layout_marginEnd="4dp"
-                            android:contentDescription="Steps"
-                            android:src="@drawable/baseline_directions_run_24"
-                            android:layout_width="14dp"
-                            android:layout_height="14dp" />
-                        <TextView
-                            android:textColor="#8CB89B"
-                            android:textSize="12sp"
-                            android:text="6500 steps"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <ImageView
-                            android:layout_marginEnd="4dp"
-                            android:contentDescription="Calories"
-                            android:src="@drawable/baseline_local_fire_department_24"
-                            android:layout_width="14dp"
-                            android:layout_height="14dp" />
-                        <TextView
-                            android:textColor="#D4A373"
-                            android:textSize="12sp"
-                            android:text="340 kcal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-
-                </LinearLayout>
-            </LinearLayout>
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- bottom navigation bar -->
+    <!-- fixed bottom navigation action bar -->
     <LinearLayout
         android:paddingTop="8dp"
         android:weightSum="3"
@@ -412,7 +319,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
-
 
         <LinearLayout
             android:gravity="center"

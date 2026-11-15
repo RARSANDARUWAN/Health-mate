@@ -8,6 +8,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,58 +18,75 @@ public class MainActivity extends AppCompatActivity {
     private Button addRecordBtn, historyBtn;
     private DatabaseHelper databaseHelper;
 
-    // chart view arrays for 7-day metrics visualization
+    // chart view references for weekly metrics display
     private View[] chartBars;
     private TextView[] dateLabels;
     private TextView[] valueLabels;
     private TextView avgCaloriesLabel;
+
+    // today dashboard summary card views
+    private TextView tvWaterVal, tvStepsVal, tvCaloriesVal, tvDateBadge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        // initialize database connection
+        // initialize sqlite database helper instance
         databaseHelper = new DatabaseHelper(this);
         databaseHelper.getWritableDatabase();
 
-        // bind views from xml layout
+        // bind top bar, action buttons, and summary components from xml
         profileImgBtn = findViewById(R.id.btnTopProfile);
         addRecordBtn = findViewById(R.id.btnAddRecord);
         historyBtn = findViewById(R.id.btnViewHistory);
         avgCaloriesLabel = findViewById(R.id.tvAvgCalories);
 
-        // setup array structures for chart bars and labels
+        tvWaterVal = findViewById(R.id.tvWaterVal);
+        tvStepsVal = findViewById(R.id.tvStepsVal);
+        tvCaloriesVal = findViewById(R.id.tvCaloriesVal);
+        tvDateBadge = findViewById(R.id.tvDateBadge);
+
+        // setup array structures for chart UI elements
         setupChartViews();
 
-        // load weekly data from database to render dynamic chart
+        // populate dashboard widgets on initial launch
         loadWeeklyChartData();
+        loadTodaySummary();
 
-        // handle profile button click
+        // handle navigation to user profile activity
         profileImgBtn.setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this, ProfileActivity.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // handle add record button click
+        // handle navigation to record creation screen
         addRecordBtn.setOnClickListener(view -> {
             Intent intentMove = new Intent(MainActivity.this, AddRecordActivity.class);
             startActivity(intentMove);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // handle history button click
+        // handle navigation to history logs activity
         historyBtn.setOnClickListener(view -> {
             Intent histIntent = new Intent(MainActivity.this, HistoryActivity.class);
             startActivity(histIntent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // initialize bottom navigation bar
+        // initialize bottom bar navigation controller
         NavigationHelper.setupBottomNavigation(this);
     }
 
-    // bind layout elements into respective arrays for easy iteration
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // refresh data widgets whenever activity regains focus
+        loadWeeklyChartData();
+        loadTodaySummary();
+    }
+
+    // map chart UI components into searchable arrays for dynamic iteration
     private void setupChartViews() {
         chartBars = new View[] {
                 findViewById(R.id.bar1), findViewById(R.id.bar2),
@@ -90,95 +110,139 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    // fetch records from db and update bar heights and labels dynamically
+    // fetch and display today's recorded health metrics on dashboard card
+    private void loadTodaySummary() {
+        String todayDbDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        String todayBadgeText = new SimpleDateFormat("MMM dd", Locale.getDefault()).format(new Date());
+
+        if (tvDateBadge != null) {
+            tvDateBadge.setText("• " + todayBadgeText);
+        }
+
+        Cursor recordCursor = databaseHelper.getRecordByDate(todayDbDate);
+        if (recordCursor != null && recordCursor.moveToFirst()) {
+            int waterAmount = recordCursor.getInt(recordCursor.getColumnIndexOrThrow("water"));
+            int stepCount = recordCursor.getInt(recordCursor.getColumnIndexOrThrow("steps"));
+            int calorieBurn = recordCursor.getInt(recordCursor.getColumnIndexOrThrow("calories"));
+
+            if (tvWaterVal != null) tvWaterVal.setText(waterAmount + " ml");
+            if (tvStepsVal != null) tvStepsVal.setText(stepCount + " steps");
+            if (tvCaloriesVal != null) tvCaloriesVal.setText(calorieBurn + " kcal");
+            recordCursor.close();
+        } else {
+            // fallback default zeros if no log exists for today
+            if (tvWaterVal != null) tvWaterVal.setText("0 ml");
+            if (tvStepsVal != null) tvStepsVal.setText("0 steps");
+            if (tvCaloriesVal != null) tvCaloriesVal.setText("0 kcal");
+        }
+    }
+
+    // query database records and render the 7-day visual bar chart
     private void loadWeeklyChartData() {
+        // reset all chart bars and text labels to baseline default empty state
+        for (int i = 0; i < 7; i++) {
+            if (dateLabels[i] != null) dateLabels[i].setText("--");
+            if (valueLabels[i] != null) valueLabels[i].setText("0");
+            if (chartBars[i] != null) {
+                android.view.ViewGroup.LayoutParams layoutParams = chartBars[i].getLayoutParams();
+                layoutParams.height = dpToPx(20);
+                chartBars[i].setLayoutParams(layoutParams);
+            }
+        }
+
         Cursor cursor = databaseHelper.getWeeklyChartData();
 
         if (cursor != null && cursor.moveToFirst()) {
-            int index = 0;
-            int totalCalories = 0;
-            int recordCount = 0;
+            int cumulativeCalories = 0;
+            int totalRecordsCount = 0;
 
+            int rowTotalCount = cursor.getCount();
+            String[] dateArray = new String[rowTotalCount];
+            int[] calorieArray = new int[rowTotalCount];
+
+            int indexTracker = 0;
             do {
-                if (index >= 7) break; // limit to maximum 7 days
-
-                String fullDate = cursor.getString(cursor.getColumnIndexOrThrow("date"));
-                int calories = cursor.getInt(cursor.getColumnIndexOrThrow("calories"));
-
-                totalCalories += calories;
-                recordCount++;
-
-                // format date string from YYYY-MM-DD to MMM DD
-                String formattedDate = formatDateString(fullDate);
-
-                // set text values to UI labels
-                if (dateLabels[index] != null) {
-                    dateLabels[index].setText(formattedDate);
-                }
-                if (valueLabels[index] != null) {
-                    valueLabels[index].setText(String.valueOf(calories));
-                }
-
-                // calculate proportional bar height based on calorie count (max 500 kcal = 120dp height)
-                int calculatedHeightPx = (calories * 120) / 500;
-                if (calculatedHeightPx < 20) {
-                    calculatedHeightPx = 20; // enforce minimum visible height
-                }
-
-                if (chartBars[index] != null) {
-                    android.view.ViewGroup.LayoutParams params = chartBars[index].getLayoutParams();
-                    params.height = dpToPx(calculatedHeightPx);
-                    chartBars[index].setLayoutParams(params);
-                }
-
-                index++;
-            } while (cursor.moveToNext());
-
+                dateArray[indexTracker] = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                calorieArray[indexTracker] = cursor.getInt(cursor.getColumnIndexOrThrow("calories"));
+                cumulativeCalories += calorieArray[indexTracker];
+                totalRecordsCount++;
+                indexTracker++;
+            } while (cursor.moveToNext() && indexTracker < rowTotalCount);
             cursor.close();
 
-            // compute and display average calorie intake
-            if (recordCount > 0) {
-                int averageCalories = totalCalories / recordCount;
-                avgCaloriesLabel.setText("Avg: " + averageCalories + " kcal");
-            }
-        }
-    }
+            // map latest records to fill up to 7 UI chart slots from right to left
+            int startOffsetIndex = rowTotalCount < 7 ? 0 : rowTotalCount - 7;
+            int currentChartIndex = 0;
 
-    // convert date format from YYYY-MM-DD into a readable short label (e.g., Jun 01)
-    private String formatDateString(String dateStr) {
-        try {
-            String[] parts = dateStr.split("-");
-            if (parts.length == 3) {
-                String monthNum = parts[1];
-                String dayNum = parts[2];
-                String monthName = "";
+            for (int j = startOffsetIndex; j < rowTotalCount && currentChartIndex < 7; j++) {
+                String formattedDateLabel = formatDateString(dateArray[j]);
+                int calorieVal = calorieArray[j];
 
-                switch (monthNum) {
-                    case "01": monthName = "Jan"; break;
-                    case "02": monthName = "Feb"; break;
-                    case "03": monthName = "Mar"; break;
-                    case "04": monthName = "Apr"; break;
-                    case "05": monthName = "May"; break;
-                    case "06": monthName = "Jun"; break;
-                    case "07": monthName = "Jul"; break;
-                    case "08": monthName = "Aug"; break;
-                    case "09": monthName = "Sep"; break;
-                    case "10": monthName = "Oct"; break;
-                    case "11": monthName = "Nov"; break;
-                    case "12": monthName = "Dec"; break;
-                    default: monthName = monthNum;
+                if (dateLabels[currentChartIndex] != null) {
+                    dateLabels[currentChartIndex].setText(formattedDateLabel);
                 }
-                return monthName + " " + dayNum;
+                if (valueLabels[currentChartIndex] != null) {
+                    valueLabels[currentChartIndex].setText(String.valueOf(calorieVal));
+                }
+
+                // calculate dynamic bar height relative to calorie value
+                int computedBarHeightPx = (calorieVal * 75) / 500;
+                if (computedBarHeightPx < 15) {
+                    computedBarHeightPx = 15; // enforce minimum display height limit
+                }
+
+                if (chartBars[currentChartIndex] != null) {
+                    android.view.ViewGroup.LayoutParams barParams = chartBars[currentChartIndex].getLayoutParams();
+                    barParams.height = dpToPx(computedBarHeightPx);
+                    chartBars[currentChartIndex].setLayoutParams(barParams);
+                }
+
+                currentChartIndex++;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            // compute and output overall average calorie intake
+            if (totalRecordsCount > 0) {
+                int meanCalories = cumulativeCalories / totalRecordsCount;
+                avgCaloriesLabel.setText("Avg: " + meanCalories + " kcal");
+            }
         }
-        return dateStr;
     }
 
-    // helper utility to convert DP units into screen pixels
-    private int dpToPx(int dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return Math.round((float) dp * density);
+    // helper utility to parse raw database date string into short readable month format
+    private String formatDateString(String rawDateString) {
+        try {
+            String[] segments = rawDateString.split("-");
+            if (segments.length == 3) {
+                String monthCode = segments[1];
+                String dayCode = segments[2];
+                String monthAbbreviation = "";
+
+                switch (monthCode) {
+                    case "01": monthAbbreviation = "Jan"; break;
+                    case "02": monthAbbreviation = "Feb"; break;
+                    case "03": monthAbbreviation = "Mar"; break;
+                    case "04": monthAbbreviation = "Apr"; break;
+                    case "05": monthAbbreviation = "May"; break;
+                    case "06": monthAbbreviation = "Jun"; break;
+                    case "07": monthAbbreviation = "Jul"; break;
+                    case "08": monthAbbreviation = "Aug"; break;
+                    case "09": monthAbbreviation = "Sep"; break;
+                    case "10": monthAbbreviation = "Oct"; break;
+                    case "11": monthAbbreviation = "Nov"; break;
+                    case "12": monthAbbreviation = "Dec"; break;
+                    default: monthAbbreviation = monthCode;
+                }
+                return monthAbbreviation + " " + dayCode;
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        return rawDateString;
+    }
+
+    // utility method to convert density-independent pixels to raw screen pixels
+    private int dpToPx(int dpValue) {
+        float screenDensity = getResources().getDisplayMetrics().density;
+        return Math.round((float) dpValue * screenDensity);
     }
 }

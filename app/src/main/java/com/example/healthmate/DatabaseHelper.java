@@ -9,9 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "health_mate.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
-    // table user schemas
+    // user table schema definitions
     public static final String TABLE_USERS = "users";
     public static final String COL_USER_ID = "u_id";
     public static final String COL_FULL_NAME = "full_name";
@@ -19,7 +19,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_EMAIL = "email";
     public static final String COL_PASSWORD = "password";
 
-    // table health records schemas
+    // health metrics table schema definitions
     public static final String TABLE_RECORDS = "health_records";
     public static final String COL_REC_ID = "id";
     public static final String COL_REC_USER_ID = "u_id";
@@ -34,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // create user accounts table
+        // build user profile table
         String createUsersQuery = "CREATE TABLE " + TABLE_USERS + " ("
                 + COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COL_FULL_NAME + " TEXT, "
@@ -43,7 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_PASSWORD + " TEXT)";
         db.execSQL(createUsersQuery);
 
-        // create health metrics tracking table with foreign key reference
+        // build health logs table with foreign key constraint
         String createRecordsQuery = "CREATE TABLE " + TABLE_RECORDS + " ("
                 + COL_REC_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + COL_REC_USER_ID + " INTEGER, "
@@ -54,14 +54,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "FOREIGN KEY(" + COL_REC_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COL_USER_ID + "))";
         db.execSQL(createRecordsQuery);
 
-        // seed initial mock data for testing and chart rendering
+        // populate initial sample seed records
         addDummyUser(db);
         addDummyRecords(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // drop old tables and recreate on schema version change
+        // drop legacy tables and trigger re-creation
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECORDS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         onCreate(db);
@@ -77,23 +77,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void addDummyRecords(SQLiteDatabase db) {
-        // mock timeline dates for dashboard charts and history logs
-        String[] dates = {
+        String[] timelineDates = {
                 "2026-06-01", "2026-06-02", "2026-06-03",
                 "2026-06-04", "2026-06-05", "2026-06-06", "2026-06-07"
         };
-        int[] steps = {6500, 7200, 8100, 5400, 9000, 7800, 8500};
-        int[] calories = {350, 390, 450, 300, 480, 410, 430};
-        int[] water = {1800, 2000, 2200, 1500, 2500, 2100, 2000};
+        int[] sampleSteps = {6500, 7200, 8100, 5400, 9000, 7800, 8500};
+        int[] sampleCalories = {350, 390, 450, 300, 480, 410, 430};
+        int[] sampleWater = {1800, 2000, 2200, 1500, 2500, 2100, 2000};
 
-        // insert 7 days of sample metrics linked to default user id 1
-        for (int i = 0; i < dates.length; i++) {
+        // loop and seed default sample weekly metrics
+        for (int i = 0; i < timelineDates.length; i++) {
             ContentValues values = new ContentValues();
             values.put(COL_REC_USER_ID, 1);
-            values.put(COL_DATE, dates[i]);
-            values.put(COL_STEPS, steps[i]);
-            values.put(COL_CALORIES, calories[i]);
-            values.put(COL_WATER, water[i]);
+            values.put(COL_DATE, timelineDates[i]);
+            values.put(COL_STEPS, sampleSteps[i]);
+            values.put(COL_CALORIES, sampleCalories[i]);
+            values.put(COL_WATER, sampleWater[i]);
             db.insert(TABLE_RECORDS, null, values);
         }
     }
@@ -106,8 +105,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COL_EMAIL, email);
         values.put(COL_PASSWORD, password);
 
-        long result = db.insert(TABLE_USERS, null, values);
-        return result != -1;
+        long resultId = db.insert(TABLE_USERS, null, values);
+        return resultId != -1;
     }
 
     public boolean checkUserLogin(String email, String password) {
@@ -115,22 +114,74 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_USERS + " WHERE " + COL_EMAIL + " = ? AND " + COL_PASSWORD + " = ?";
         Cursor cursor = db.rawQuery(query, new String[]{email, password});
 
-        boolean isValid = cursor.getCount() > 0;
+        boolean isValidUser = cursor.getCount() > 0;
         cursor.close();
-        return isValid;
+        return isValidUser;
     }
 
     public Cursor getAllHealthRecords() {
         SQLiteDatabase db = this.getReadableDatabase();
-        // fetch all records sorted by latest date first for history view
+        // fetch all records sorted by most recent date first
         String query = "SELECT * FROM " + TABLE_RECORDS + " ORDER BY " + COL_DATE + " DESC";
         return db.rawQuery(query, null);
     }
 
     public Cursor getWeeklyChartData() {
         SQLiteDatabase db = this.getReadableDatabase();
-        // fetch chronological sequence of last 7 days data for dashboard bar charts
-        String query = "SELECT * FROM " + TABLE_RECORDS + " ORDER BY " + COL_DATE + " ASC LIMIT 7";
+        // query records in ascending order for dashboard chart rendering
+        String query = "SELECT * FROM " + TABLE_RECORDS + " ORDER BY " + COL_DATE + " ASC";
         return db.rawQuery(query, null);
+    }
+
+    public Cursor getRecordByDate(String targetDate) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_RECORDS + " WHERE " + COL_DATE + " = ?";
+        return db.rawQuery(query, new String[]{targetDate});
+    }
+
+    public boolean checkRecordExistsByDate(String targetDate) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_RECORDS + " WHERE " + COL_DATE + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{targetDate});
+        boolean isExisting = cursor.getCount() > 0;
+        cursor.close();
+        return isExisting;
+    }
+
+    public boolean insertHealthRecord(int userId, String date, int steps, int calories, int water) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_REC_USER_ID, userId);
+        values.put(COL_DATE, date);
+        values.put(COL_STEPS, steps);
+        values.put(COL_CALORIES, calories);
+        values.put(COL_WATER, water);
+
+        long insertId = db.insert(TABLE_RECORDS, null, values);
+        return insertId != -1;
+    }
+
+    public Cursor getRecentHealthRecords() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        // fetch top 5 latest logs for recent activity list
+        String query = "SELECT * FROM " + TABLE_RECORDS + " ORDER BY " + COL_DATE + " DESC LIMIT 5";
+        return db.rawQuery(query, null);
+    }
+
+    public boolean deleteRecordById(int recordId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int affectedRows = db.delete(TABLE_RECORDS, COL_REC_ID + " = ?", new String[]{String.valueOf(recordId)});
+        return affectedRows > 0;
+    }
+
+    public boolean updateHealthRecord(int recordId, int steps, int calories, int water) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_STEPS, steps);
+        values.put(COL_CALORIES, calories);
+        values.put(COL_WATER, water);
+
+        int affectedRows = db.update(TABLE_RECORDS, values, COL_REC_ID + " = ?", new String[]{String.valueOf(recordId)});
+        return affectedRows > 0;
     }
 }

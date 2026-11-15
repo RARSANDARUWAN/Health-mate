@@ -18,160 +18,163 @@ import java.util.Locale;
 
 public class AddRecordActivity extends AppCompatActivity {
 
-    private EditText etWater, etSteps, etCalories;
-    private Button btnSaveRecord;
-    private TextView tvSelectedDate;
-    private LinearLayout layoutDate, recentLogsContainer;
-    private ImageView btnBack;
+    private EditText waterInput, stepsInput, caloriesInput;
+    private Button saveRecordBtn;
+    private TextView selectedDateLabel;
+    private LinearLayout datePickerLayout, logsContainer;
+    private ImageView backButton;
     private DatabaseHelper databaseHelper;
 
-    private String selectedDateFormatted = "";
-    private Calendar calendar;
+    private String targetDateFormatted = "";
+    private Calendar calendarInstance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addrec);
 
-        // Initialize database helper and UI components
+        // initialize db and bind layout components
         databaseHelper = new DatabaseHelper(this);
-        etWater = findViewById(R.id.etWater);
-        etSteps = findViewById(R.id.etSteps);
-        etCalories = findViewById(R.id.etCalories);
-        btnSaveRecord = findViewById(R.id.btnSaveRecord);
-        tvSelectedDate = findViewById(R.id.tvSelectedDate);
-        layoutDate = findViewById(R.id.layoutDate);
-        recentLogsContainer = findViewById(R.id.recentLogsContainer);
-        btnBack = findViewById(R.id.btnBack);
+        waterInput = findViewById(R.id.etWater);
+        stepsInput = findViewById(R.id.etSteps);
+        caloriesInput = findViewById(R.id.etCalories);
+        saveRecordBtn = findViewById(R.id.btnSaveRecord);
+        selectedDateLabel = findViewById(R.id.tvSelectedDate);
+        datePickerLayout = findViewById(R.id.layoutDate);
+        logsContainer = findViewById(R.id.recentLogsContainer);
+        backButton = findViewById(R.id.btnBack);
 
-        calendar = Calendar.getInstance();
-        setDefaultDateToday();
+        calendarInstance = Calendar.getInstance();
+        setInitialDateToday();
 
-        // Open calendar dialog on date card click
-        layoutDate.setOnClickListener(v -> showDatePickerDialog());
+        // open popup date selector
+        datePickerLayout.setOnClickListener(v -> openDatePicker());
 
-        // Validate and save record on button click
-        btnSaveRecord.setOnClickListener(v -> validateAndSaveRecord());
+        // handle record submission
+        saveRecordBtn.setOnClickListener(v -> validateAndStoreRecord());
 
-        // Handle back button click
-        btnBack.setOnClickListener(v -> finish());
+        // return on back click
+        backButton.setOnClickListener(v -> finish());
 
-        // Load recent logs list on startup
-        loadRecentLogs();
+        // populate recent history list on load
+        fetchRecentLogs();
 
+        // setup navigation modules
         NavigationHelper.setupBottomNavigation(this);
         NavigationHelper.setupTopBarActions(this);
     }
 
-    // Set today's date by default
-    private void setDefaultDateToday() {
-        SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        selectedDateFormatted = dbFormat.format(calendar.getTime());
+    // set current date by default on startup
+    private void setInitialDateToday() {
+        SimpleDateFormat dbFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        targetDateFormatted = dbFormatter.format(calendarInstance.getTime());
 
-        SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-        tvSelectedDate.setText("Today, " + displayFormat.format(calendar.getTime()));
+        SimpleDateFormat displayFormatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        selectedDateLabel.setText("Today, " + displayFormatter.format(calendarInstance.getTime()));
     }
 
-    // Show date picker dialog to select custom date
-    private void showDatePickerDialog() {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
+    // display native date picker dialog
+    private void openDatePicker() {
+        DatePickerDialog pickerDialog = new DatePickerDialog(
                 this,
                 (view, year, month, dayOfMonth) -> {
-                    calendar.set(year, month, dayOfMonth);
-                    SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                    selectedDateFormatted = dbFormat.format(calendar.getTime());
+                    calendarInstance.set(year, month, dayOfMonth);
+                    SimpleDateFormat dbFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    targetDateFormatted = dbFormatter.format(calendarInstance.getTime());
 
-                    SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-                    tvSelectedDate.setText(displayFormat.format(calendar.getTime()));
+                    SimpleDateFormat displayFormatter = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+                    selectedDateLabel.setText(displayFormatter.format(calendarInstance.getTime()));
                 },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
+                calendarInstance.get(Calendar.YEAR),
+                calendarInstance.get(Calendar.MONTH),
+                calendarInstance.get(Calendar.DAY_OF_MONTH)
         );
-        datePickerDialog.show();
+        pickerDialog.show();
     }
 
-    // Validate inputs and insert into database
-    private void validateAndSaveRecord() {
-        String waterStr = etWater.getText().toString().trim();
-        String stepsStr = etSteps.getText().toString().trim();
-        String caloriesStr = etCalories.getText().toString().trim();
+    // validate user inputs and perform database insertion
+    private void validateAndStoreRecord() {
+        String waterString = waterInput.getText().toString().trim();
+        String stepsString = stepsInput.getText().toString().trim();
+        String caloriesString = caloriesInput.getText().toString().trim();
 
-        // Check for empty fields
-        if (waterStr.isEmpty() || stepsStr.isEmpty() || caloriesStr.isEmpty()) {
+        // ensure all fields have values
+        if (waterString.isEmpty() || stepsString.isEmpty() || caloriesString.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        int water = Integer.parseInt(waterStr);
-        int steps = Integer.parseInt(stepsStr);
-        int calories = Integer.parseInt(caloriesStr);
+        int waterVal = Integer.parseInt(waterString);
+        int stepsVal = Integer.parseInt(stepsString);
+        int caloriesVal = Integer.parseInt(caloriesString);
 
-        // Prevent zero or negative values
-        if (water <= 0 || steps <= 0 || calories <= 0) {
+        // reject zero or negative numbers
+        if (waterVal <= 0 || stepsVal <= 0 || caloriesVal <= 0) {
             Toast.makeText(this, "Values cannot be zero or negative!", Toast.LENGTH_SHORT).show();
             return;
         }
-        // Prevent selecting future dates
+
+        // block future dates entry
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            java.util.Date selectedDate = sdf.parse(selectedDateFormatted);
-            java.util.Date currentDate = sdf.parse(sdf.format(Calendar.getInstance().getTime()));
+            java.util.Date chosenDate = sdf.parse(targetDateFormatted);
+            java.util.Date currentSystemDate = sdf.parse(sdf.format(Calendar.getInstance().getTime()));
 
-            if (selectedDate != null && selectedDate.after(currentDate)) {
+            if (chosenDate != null && chosenDate.after(currentSystemDate)) {
                 Toast.makeText(this, "Cannot add records for future dates!", Toast.LENGTH_LONG).show();
                 return;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // Check if record for selected date already exists
-        if (databaseHelper.checkRecordExistsByDate(selectedDateFormatted)) {
+
+        // check if entry for this date already exists
+        if (databaseHelper.checkRecordExistsByDate(targetDateFormatted)) {
             Toast.makeText(this, "A record for this date already exists!", Toast.LENGTH_LONG).show();
             return;
         }
 
-        // Insert record into database (default user id = 1)
-        boolean isInserted = databaseHelper.insertHealthRecord(1, selectedDateFormatted, steps, calories, water);
+        // insert metrics into db for user id 1
+        boolean isSaved = databaseHelper.insertHealthRecord(1, targetDateFormatted, stepsVal, caloriesVal, waterVal);
 
-        if (isInserted) {
+        if (isSaved) {
             Toast.makeText(this, "Successfully data inserted!", Toast.LENGTH_SHORT).show();
-            etWater.setText("");
-            etSteps.setText("");
-            etCalories.setText("");
-            loadRecentLogs(); // Refresh recent logs dynamically
+            waterInput.setText("");
+            stepsInput.setText("");
+            caloriesInput.setText("");
+            fetchRecentLogs(); // reload UI list dynamically
         } else {
             Toast.makeText(this, "Failed to insert record. Try again.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // Load recent 5 records dynamically and populate container
-    private void loadRecentLogs() {
-        recentLogsContainer.removeAllViews(); // Clear old views before reloading
+    // fetch recent logs from sqlite and dynamically inflate card views
+    private void fetchRecentLogs() {
+        logsContainer.removeAllViews(); // clear previous views
         Cursor cursor = databaseHelper.getRecentHealthRecords();
 
         if (cursor != null && cursor.moveToFirst()) {
-            LayoutInflater inflater = LayoutInflater.from(this);
+            LayoutInflater layoutInflater = LayoutInflater.from(this);
             do {
-                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
-                int steps = cursor.getInt(cursor.getColumnIndexOrThrow("steps"));
-                int calories = cursor.getInt(cursor.getColumnIndexOrThrow("calories"));
-                int water = cursor.getInt(cursor.getColumnIndexOrThrow("water"));
+                String recordDate = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                int recordSteps = cursor.getInt(cursor.getColumnIndexOrThrow("steps"));
+                int recordCalories = cursor.getInt(cursor.getColumnIndexOrThrow("calories"));
+                int recordWater = cursor.getInt(cursor.getColumnIndexOrThrow("water"));
 
-                // Inflate a card layout for each log item
-                View cardView = inflater.inflate(R.layout.item_recent_log, recentLogsContainer, false);
+                // inflate layout card item
+                View cardItemView = layoutInflater.inflate(R.layout.item_recent_log, logsContainer, false);
 
-                TextView tvDate = cardView.findViewById(R.id.tvLogDate);
-                TextView tvWater = cardView.findViewById(R.id.tvLogWater);
-                TextView tvSteps = cardView.findViewById(R.id.tvLogSteps);
-                TextView tvCalories = cardView.findViewById(R.id.tvLogCalories);
+                TextView dateTv = cardItemView.findViewById(R.id.tvLogDate);
+                TextView waterTv = cardItemView.findViewById(R.id.tvLogWater);
+                TextView stepsTv = cardItemView.findViewById(R.id.tvLogSteps);
+                TextView caloriesTv = cardItemView.findViewById(R.id.tvLogCalories);
 
-                tvDate.setText(date);
-                tvWater.setText(water + " ml");
-                tvSteps.setText(steps + " steps");
-                tvCalories.setText(calories + " kcal");
+                dateTv.setText(recordDate);
+                waterTv.setText(recordWater + " ml");
+                stepsTv.setText(recordSteps + " steps");
+                caloriesTv.setText(recordCalories + " kcal");
 
-                recentLogsContainer.addView(cardView);
+                logsContainer.addView(cardItemView);
             } while (cursor.moveToNext());
             cursor.close();
         }

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#121C14">
 
-    <!-- Main scroll container -->
+    <!-- main scrollable root layout container -->
     <ScrollView
         android:fillViewport="true"
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Top header bar -->
+            <!-- top header navigation bar layout -->
             <LinearLayout
                 android:layout_marginBottom="24dp"
                 android:gravity="center_vertical"
@@ -58,7 +58,7 @@
                     android:layout_height="24dp" />
             </LinearLayout>
 
-            <!-- Summary section title -->
+            <!-- summary header label title banner -->
             <LinearLayout
                 android:layout_marginBottom="16dp"
                 android:gravity="center_vertical"
@@ -101,7 +101,7 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <!-- Water intake card -->
+            <!-- water intake metric display card -->
             <LinearLayout
                 android:layout_marginBottom="12dp"
                 android:paddingHorizontal="16dp"
@@ -143,7 +143,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Steps walked card -->
+            <!-- steps walked metric display card -->
             <LinearLayout
                 android:layout_marginBottom="12dp"
                 android:paddingHorizontal="16dp"
@@ -185,7 +185,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Calories burned card -->
+            <!-- calories burned metric display card -->
             <LinearLayout
                 android:layout_marginBottom="24dp"
                 android:paddingHorizontal="16dp"
@@ -227,7 +227,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Weekly chart section -->
+            <!-- weekly chart visualization container card -->
             <LinearLayout
                 android:padding="16dp"
                 android:background="#1A261D"
@@ -262,25 +262,25 @@
                         android:layout_height="wrap_content" />
                 </LinearLayout>
 
-                <!-- Dynamic 7-day bars layout -->
+                <!-- dynamic 7-day bar chart layout container -->
                 <LinearLayout
                     android:weightSum="7"
                     android:orientation="horizontal"
-                    android:gravity="bottom|center"
+                    android:gravity="bottom"
                     android:layout_width="match_parent"
-                    android:layout_height="140dp">
+                    android:layout_height="160dp">
 
-                    <!-- Bar 1 -->
+                    <!-- chart bar column 1 -->
                     <LinearLayout
                         android:orientation="vertical"
-                        android:gravity="bottom|center"
+                        android:gravity="bottom|center_horizontal"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1">
 
                         <TextView
                             android:id="@+id/tvVal1"
-                            android:layout_marginBottom="4px"
+                            android:layout_marginBottom="4dp"
                             android:textColor="#8FA693"
                             android:textSize="9sp"
                             android:text="0"
@@ -290,30 +290,30 @@
                         <View
                             android:background="#8CB89B"
                             android:id="@+id/bar1"
-                            android:layout_width="16dp"
+                            android:layout_width="14dp"
                             android:layout_height="20dp" />
 
                         <TextView
                             android:id="@+id/tvDay1"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="4dp"
                             android:textColor="#8FA693"
-                            android:textSize="10sp"
+                            android:textSize="9sp"
                             android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
 
-                    <!-- Bar 2 -->
+                    <!-- chart bar column 2 -->
                     <LinearLayout
                         android:orientation="vertical"
-                        android:gravity="bottom|center"
+                        android:gravity="bottom|center_horizontal"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1">
 
                         <TextView
                             android:id="@+id/tvVal2"
-                            android:layout_marginBottom="4px"
+                            android:layout_marginBottom="4dp"
                             android:textColor="#8FA693"
                             android:textSize="9sp"
                             android:text="0"
@@ -323,30 +323,30 @@
                         <View
                             android:background="#8CB89B"
                             android:id="@+id/bar2"
-                            android:layout_width="16dp"
+                            android:layout_width="14dp"
                             android:layout_height="20dp" />
 
                         <TextView
                             android:id="@+id/tvDay2"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="4dp"
                             android:textColor="#8FA693"
-                            android:textSize="10sp"
+                            android:textSize="9sp"
                             android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
 
-                    <!-- Bar 3 -->
+                    <!-- chart bar column 3 -->
                     <LinearLayout
                         android:orientation="vertical"
-                        android:gravity="bottom|center"
+                        android:gravity="bottom|center_horizontal"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1">
 
                         <TextView
                             android:id="@+id/tvVal3"
-                            android:layout_marginBottom="4px"
+                            android:layout_marginBottom="4dp"
                             android:textColor="#8FA693"
                             android:textSize="9sp"
                             android:text="0"
@@ -356,30 +356,30 @@
                         <View
                             android:background="#8CB89B"
                             android:id="@+id/bar3"
-                            android:layout_width="16dp"
+                            android:layout_width="14dp"
                             android:layout_height="20dp" />
 
                         <TextView
                             android:id="@+id/tvDay3"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="4dp"
                             android:textColor="#8FA693"
-                            android:textSize="10sp"
+                            android:textSize="9sp"
                             android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
 
-                    <!-- Bar 4 -->
+                    <!-- chart bar column 4 -->
                     <LinearLayout
                         android:orientation="vertical"
-                        android:gravity="bottom|center"
+                        android:gravity="bottom|center_horizontal"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1">
 
                         <TextView
                             android:id="@+id/tvVal4"
-                            android:layout_marginBottom="4px"
+                            android:layout_marginBottom="4dp"
                             android:textColor="#8FA693"
                             android:textSize="9sp"
                             android:text="0"
@@ -389,30 +389,30 @@
                         <View
                             android:background="#8CB89B"
                             android:id="@+id/bar4"
-                            android:layout_width="16dp"
+                            android:layout_width="14dp"
                             android:layout_height="20dp" />
 
                         <TextView
                             android:id="@+id/tvDay4"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="4dp"
                             android:textColor="#8FA693"
-                            android:textSize="10sp"
+                            android:textSize="9sp"
                             android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
 
-                    <!-- Bar 5 -->
+                    <!-- chart bar column 5 -->
                     <LinearLayout
                         android:orientation="vertical"
-                        android:gravity="bottom|center"
+                        android:gravity="bottom|center_horizontal"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1">
 
                         <TextView
                             android:id="@+id/tvVal5"
-                            android:layout_marginBottom="4px"
+                            android:layout_marginBottom="4dp"
                             android:textColor="#8FA693"
                             android:textSize="9sp"
                             android:text="0"
@@ -422,30 +422,30 @@
                         <View
                             android:background="#8CB89B"
                             android:id="@+id/bar5"
-                            android:layout_width="16dp"
+                            android:layout_width="14dp"
                             android:layout_height="20dp" />
 
                         <TextView
                             android:id="@+id/tvDay5"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="4dp"
                             android:textColor="#8FA693"
-                            android:textSize="10sp"
+                            android:textSize="9sp"
                             android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
 
-                    <!-- Bar 6 -->
+                    <!-- chart bar column 6 -->
                     <LinearLayout
                         android:orientation="vertical"
-                        android:gravity="bottom|center"
+                        android:gravity="bottom|center_horizontal"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1">
 
                         <TextView
                             android:id="@+id/tvVal6"
-                            android:layout_marginBottom="4px"
+                            android:layout_marginBottom="4dp"
                             android:textColor="#8FA693"
                             android:textSize="9sp"
                             android:text="0"
@@ -455,30 +455,30 @@
                         <View
                             android:background="#8CB89B"
                             android:id="@+id/bar6"
-                            android:layout_width="16dp"
+                            android:layout_width="14dp"
                             android:layout_height="20dp" />
 
                         <TextView
                             android:id="@+id/tvDay6"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="4dp"
                             android:textColor="#8FA693"
-                            android:textSize="10sp"
+                            android:textSize="9sp"
                             android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
                     </LinearLayout>
 
-                    <!-- Bar 7 (Today / Most recent) -->
+                    <!-- chart bar column 7 representing latest day -->
                     <LinearLayout
                         android:orientation="vertical"
-                        android:gravity="bottom|center"
+                        android:gravity="bottom|center_horizontal"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1">
 
                         <TextView
                             android:id="@+id/tvVal7"
-                            android:layout_marginBottom="4px"
+                            android:layout_marginBottom="4dp"
                             android:textColor="#4CAF50"
                             android:textSize="9sp"
                             android:text="0"
@@ -488,15 +488,15 @@
                         <View
                             android:background="#2E7D32"
                             android:id="@+id/bar7"
-                            android:layout_width="16dp"
+                            android:layout_width="14dp"
                             android:layout_height="20dp" />
 
                         <TextView
                             android:id="@+id/tvDay7"
+                            android:layout_marginTop="4dp"
                             android:textStyle="bold"
-                            android:layout_marginTop="6dp"
                             android:textColor="#FFFFFF"
-                            android:textSize="10sp"
+                            android:textSize="9sp"
                             android:text="--"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
@@ -505,7 +505,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Quick action buttons -->
+            <!-- quick action button to add new record entry -->
             <Button
                 android:layout_marginBottom="12dp"
                 android:backgroundTint="#10B981"
@@ -517,6 +517,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp" />
 
+            <!-- secondary action buttons row -->
             <LinearLayout
                 android:layout_marginBottom="24dp"
                 android:orientation="horizontal"
@@ -549,7 +550,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom navigation bar -->
+    <!-- fixed bottom navigation action bar -->
     <LinearLayout
         android:paddingTop="8dp"
         android:weightSum="3"
