@@ -27,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
     // today dashboard summary card views
     private TextView tvWaterVal, tvStepsVal, tvCaloriesVal, tvDateBadge;
 
+    private ImageView logoutImgBtn;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +79,31 @@ public class MainActivity extends AppCompatActivity {
 
         // initialize bottom bar navigation controller
         NavigationHelper.setupBottomNavigation(this);
+
+        //linking logout button
+        logoutImgBtn = findViewById(R.id.btnLogout);
+
+        // Logout button click event with Yes/No confirmation
+        logoutImgBtn.setOnClickListener(view -> {
+            new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Logout")
+                    .setMessage("Are you sure you want to log out?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        android.widget.Toast.makeText(MainActivity.this, "Logged out successfully", android.widget.Toast.LENGTH_SHORT).show();
+
+                        Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
+                        // close whole screens that pre written
+                        logoutIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(logoutIntent);
+                        finish();
+                    })
+                    .setNegativeButton("No", (dialog, which) -> {
+                        // Nothing happens when press no
+                        dialog.dismiss();
+                    })
+                    .show();
+        });
+
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.example.healthmate;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +12,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private EditText nameField, ageField, emailField, passField;
     private Button registerButton;
+    private TextView loginLinkText;
     private DatabaseHelper databaseHelper;
 
     @Override
@@ -19,14 +22,15 @@ public class RegisterActivity extends AppCompatActivity {
 
         databaseHelper = new DatabaseHelper(this);
 
-        // link xml views
+        // Link XML views properly
         nameField = findViewById(R.id.etFullName);
         ageField = findViewById(R.id.etAge);
         emailField = findViewById(R.id.etEmail);
         passField = findViewById(R.id.etPassword);
         registerButton = findViewById(R.id.btnRegister);
+        loginLinkText = findViewById(R.id.tvLoginLink);
 
-        // handle register button click
+        // Handle Register button click
         registerButton.setOnClickListener(view -> {
             String fullName = nameField.getText().toString().trim();
             String ageText = ageField.getText().toString().trim();
@@ -43,10 +47,20 @@ public class RegisterActivity extends AppCompatActivity {
 
             if (success) {
                 Toast.makeText(this, "Account Created Successfully!", Toast.LENGTH_SHORT).show();
+                // Redirect to Login screen after successful registration
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
                 finish();
             } else {
-                Toast.makeText(this, "Registration Failed (Email may already exist)", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Registration Failed! Email may already exist.", Toast.LENGTH_LONG).show();
             }
+        });
+
+        // Handle Login Here text click to navigate to Login screen
+        loginLinkText.setOnClickListener(view -> {
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
         });
     }
 }
