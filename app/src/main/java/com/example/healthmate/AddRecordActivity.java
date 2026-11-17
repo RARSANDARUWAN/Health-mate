@@ -1,6 +1,7 @@
 package com.example.healthmate;
 
 import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ public class AddRecordActivity extends AppCompatActivity {
     private ImageView backButton;
     private DatabaseHelper databaseHelper;
 
+    private int activeUserId = -1;
     private String targetDateFormatted = "";
     private Calendar calendarInstance;
 
@@ -32,6 +34,10 @@ public class AddRecordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addrec);
+
+        // retrieve active logged-in user id from session preferences
+        SharedPreferences sessionPrefs = getSharedPreferences("HealthMateSession", MODE_PRIVATE);
+        activeUserId = sessionPrefs.getInt("logged_in_user_id", -1);
 
         // initialize db and bind layout components
         databaseHelper = new DatabaseHelper(this);
@@ -56,7 +62,7 @@ public class AddRecordActivity extends AppCompatActivity {
         // return on back click
         backButton.setOnClickListener(v -> finish());
 
-        // populate recent history list on load
+        // populate active user's recent history list on load
         fetchRecentLogs();
 
         // setup navigation modules
@@ -92,13 +98,12 @@ public class AddRecordActivity extends AppCompatActivity {
         pickerDialog.show();
     }
 
-    // validate user inputs and perform database insertion
+    // validate user inputs and perform database insertion for active user
     private void validateAndStoreRecord() {
         String waterString = waterInput.getText().toString().trim();
         String stepsString = stepsInput.getText().toString().trim();
         String caloriesString = caloriesInput.getText().toString().trim();
 
-        // ensure all fields have values
         if (waterString.isEmpty() || stepsString.isEmpty() || caloriesString.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields!", Toast.LENGTH_SHORT).show();
             return;
@@ -108,13 +113,11 @@ public class AddRecordActivity extends AppCompatActivity {
         int stepsVal = Integer.parseInt(stepsString);
         int caloriesVal = Integer.parseInt(caloriesString);
 
-        // reject zero or negative numbers
         if (waterVal <= 0 || stepsVal <= 0 || caloriesVal <= 0) {
             Toast.makeText(this, "Values cannot be zero or negative!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // block future dates entry
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             java.util.Date chosenDate = sdf.parse(targetDateFormatted);
@@ -128,30 +131,30 @@ public class AddRecordActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // check if entry for this date already exists
-        if (databaseHelper.checkRecordExistsByDate(targetDateFormatted)) {
+        // check if entry for this date already exists for this specific user
+        if (databaseHelper.checkRecordExistsByDateAndUser(activeUserId, targetDateFormatted)) {
             Toast.makeText(this, "A record for this date already exists!", Toast.LENGTH_LONG).show();
             return;
         }
 
-        // insert metrics into db for user id 1
-        boolean isSaved = databaseHelper.insertHealthRecord(1, targetDateFormatted, stepsVal, caloriesVal, waterVal);
+        // insert metrics into db under active user's id
+        boolean isSaved = databaseHelper.insertHealthRecord(activeUserId, targetDateFormatted, stepsVal, caloriesVal, waterVal);
 
         if (isSaved) {
             Toast.makeText(this, "Successfully data inserted!", Toast.LENGTH_SHORT).show();
             waterInput.setText("");
             stepsInput.setText("");
             caloriesInput.setText("");
-            fetchRecentLogs(); // reload UI list dynamically
+            fetchRecentLogs();
         } else {
             Toast.makeText(this, "Failed to insert record. Try again.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // fetch recent logs from sqlite and dynamically inflate card views
+    // fetch active user's recent logs from sqlite and inflate card views
     private void fetchRecentLogs() {
-        logsContainer.removeAllViews(); // clear previous views
-        Cursor cursor = databaseHelper.getRecentHealthRecords();
+        logsContainer.removeAllViews();
+        Cursor cursor = databaseHelper.getRecentHealthRecordsByUser(activeUserId);
 
         if (cursor != null && cursor.moveToFirst()) {
             LayoutInflater layoutInflater = LayoutInflater.from(this);
@@ -161,7 +164,6 @@ public class AddRecordActivity extends AppCompatActivity {
                 int recordCalories = cursor.getInt(cursor.getColumnIndexOrThrow("calories"));
                 int recordWater = cursor.getInt(cursor.getColumnIndexOrThrow("water"));
 
-                // inflate layout card item
                 View cardItemView = layoutInflater.inflate(R.layout.item_recent_log, logsContainer, false);
 
                 TextView dateTv = cardItemView.findViewById(R.id.tvLogDate);

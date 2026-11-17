@@ -19,11 +19,19 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // check if user is already logged in and redirect straight to dashboard
+        SharedPreferences sessionPrefs = getSharedPreferences("HealthMateSession", MODE_PRIVATE);
+        int savedUserId = sessionPrefs.getInt("logged_in_user_id", -1);
+        if (savedUserId != -1) {
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_login);
 
         databaseHelper = new DatabaseHelper(this);
-
-        // initialize database and insert dummy data if needed
         databaseHelper.getWritableDatabase();
 
         // bind xml views
@@ -42,9 +50,13 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            // Check login credentials against database
+            // verify credentials and save active user id to session preferences
             if (databaseHelper.checkUserLogin(userEmail, userPass)) {
+                int userId = databaseHelper.getUserIdByEmail(userEmail);
 
+                SharedPreferences.Editor editor = sessionPrefs.edit();
+                editor.putInt("logged_in_user_id", userId);
+                editor.apply();
 
                 Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -54,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // register page link navigation
+        // navigate to registration screen
         registerText.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
         });

@@ -12,9 +12,10 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules">
 
-        <!-- login screen entry point -->
+        <!-- Launch app directly into dashboard to verify active user session -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,28 +23,27 @@
             </intent-filter>
         </activity>
 
-        <!-- user registration screen -->
+        <!-- Login screen shown when no active session exists or after logout -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+
+        <!-- New user registration screen -->
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
 
-        <!-- main dashboard screen -->
-        <activity
-            android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false" />
-
-        <!-- history log viewer screen -->
+        <!-- Detailed health records history screen -->
         <activity
             android:name=".HistoryActivity"
             android:exported="false" />
 
-        <!-- user profile details screen -->
+        <!-- User profile and settings screen -->
         <activity
             android:name=".ProfileActivity"
             android:exported="false" />
 
-        <!-- add new health record screen -->
+        <!-- Daily health log entry screen -->
         <activity
             android:name=".AddRecordActivity"
             android:exported="false" />

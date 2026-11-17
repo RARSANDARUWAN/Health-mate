@@ -1,12 +1,15 @@
 package com.example.healthmate;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,33 +17,46 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageView profileImgBtn;
+    private ImageView profileImgBtn, logoutImgBtn;
     private Button addRecordBtn, historyBtn;
     private DatabaseHelper databaseHelper;
+    private int activeUserId = -1;
 
-    // chart view references for weekly metrics display
+    // UI references for the 7-day calorie bar chart
     private View[] chartBars;
     private TextView[] dateLabels;
     private TextView[] valueLabels;
     private TextView avgCaloriesLabel;
 
-    // today dashboard summary card views
+    // UI references for today's health summary cards
     private TextView tvWaterVal, tvStepsVal, tvCaloriesVal, tvDateBadge;
-
-    private ImageView logoutImgBtn;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Verify if a user is currently logged in before loading the dashboard
+        SharedPreferences sessionPrefs = getSharedPreferences("HealthMateSession", MODE_PRIVATE);
+        activeUserId = sessionPrefs.getInt("logged_in_user_id", -1);
+
+        // Redirect to login screen if no active user session is found
+        if (activeUserId == -1) {
+            Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(loginIntent);
+            finish();
+            return;
+        }
+
+        // Load dashboard layout directly for the logged-in user
         setContentView(R.layout.activity_dashboard);
 
-        // initialize sqlite database helper instance
+        // Initialize SQLite database helper
         databaseHelper = new DatabaseHelper(this);
         databaseHelper.getWritableDatabase();
 
-        // bind top bar, action buttons, and summary components from xml
+        // Bind header, action buttons, and metric TextViews
         profileImgBtn = findViewById(R.id.btnTopProfile);
+        logoutImgBtn = findViewById(R.id.btnLogout);
         addRecordBtn = findViewById(R.id.btnAddRecord);
         historyBtn = findViewById(R.id.btnViewHistory);
         avgCaloriesLabel = findViewById(R.id.tvAvgCalories);
@@ -50,75 +66,68 @@ public class MainActivity extends AppCompatActivity {
         tvCaloriesVal = findViewById(R.id.tvCaloriesVal);
         tvDateBadge = findViewById(R.id.tvDateBadge);
 
-        // setup array structures for chart UI elements
+        // Prepare bar chart view arrays and populate user-specific metrics
         setupChartViews();
-
-        // populate dashboard widgets on initial launch
         loadWeeklyChartData();
         loadTodaySummary();
 
-        // handle navigation to user profile activity
+        // Open user profile screen
         profileImgBtn.setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this, ProfileActivity.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // handle navigation to record creation screen
+        // Open new health record entry screen
         addRecordBtn.setOnClickListener(view -> {
-            Intent intentMove = new Intent(MainActivity.this, AddRecordActivity.class);
-            startActivity(intentMove);
+            startActivity(new Intent(MainActivity.this, AddRecordActivity.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // handle navigation to history logs activity
+        // Open full health history screen
         historyBtn.setOnClickListener(view -> {
-            Intent histIntent = new Intent(MainActivity.this, HistoryActivity.class);
-            startActivity(histIntent);
+            startActivity(new Intent(MainActivity.this, HistoryActivity.class));
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
 
-        // initialize bottom bar navigation controller
+        // Initialize bottom navigation bar
         NavigationHelper.setupBottomNavigation(this);
 
-        //linking logout button
-        logoutImgBtn = findViewById(R.id.btnLogout);
-
-        // Logout button click event with Yes/No confirmation
+        // Prompt confirmation before clearing session and logging out
         logoutImgBtn.setOnClickListener(view -> {
-            new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
+            new AlertDialog.Builder(MainActivity.this)
                     .setTitle("Logout")
                     .setMessage("Are you sure you want to log out?")
                     .setPositiveButton("Yes", (dialog, which) -> {
-                        android.widget.Toast.makeText(MainActivity.this, "Logged out successfully", android.widget.Toast.LENGTH_SHORT).show();
+                        SharedPreferences.Editor editor = sessionPrefs.edit();
+                        editor.clear();
+                        editor.apply();
 
+                        Toast.makeText(MainActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
                         Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
-                        // close whole screens that pre written
                         logoutIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(logoutIntent);
                         finish();
                     })
-                    .setNegativeButton("No", (dialog, which) -> {
-                        // Nothing happens when press no
-                        dialog.dismiss();
-                    })
+                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                     .show();
         });
-    //Share summery btn
+
+        // Trigger health summary share sheet
         Button btnShareSummary = findViewById(R.id.btnShareSummary);
-
         btnShareSummary.setOnClickListener(v -> shareHealthSummary());
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // refresh data widgets whenever activity regains focus
+        // Reload current user's metrics whenever returning to the dashboard
+        SharedPreferences sessionPrefs = getSharedPreferences("HealthMateSession", MODE_PRIVATE);
+        activeUserId = sessionPrefs.getInt("logged_in_user_id", -1);
         loadWeeklyChartData();
         loadTodaySummary();
     }
 
-    // map chart UI components into searchable arrays for dynamic iteration
+    // Group bar chart views into arrays for easy loop updates
     private void setupChartViews() {
         chartBars = new View[] {
                 findViewById(R.id.bar1), findViewById(R.id.bar2),
@@ -142,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    // fetch and display today's recorded health metrics on dashboard card
+    // Fetch and display today's water, steps, and calorie stats for the active user
     private void loadTodaySummary() {
         String todayDbDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         String todayBadgeText = new SimpleDateFormat("MMM dd", Locale.getDefault()).format(new Date());
@@ -151,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             tvDateBadge.setText("• " + todayBadgeText);
         }
 
-        Cursor recordCursor = databaseHelper.getRecordByDate(todayDbDate);
+        Cursor recordCursor = databaseHelper.getRecordByDateAndUser(activeUserId, todayDbDate);
         if (recordCursor != null && recordCursor.moveToFirst()) {
             int waterAmount = recordCursor.getInt(recordCursor.getColumnIndexOrThrow("water"));
             int stepCount = recordCursor.getInt(recordCursor.getColumnIndexOrThrow("steps"));
@@ -162,16 +171,15 @@ public class MainActivity extends AppCompatActivity {
             if (tvCaloriesVal != null) tvCaloriesVal.setText(calorieBurn + " kcal");
             recordCursor.close();
         } else {
-            // fallback default zeros if no log exists for today
+            // Reset summary cards to zero if no record exists for today
             if (tvWaterVal != null) tvWaterVal.setText("0 ml");
             if (tvStepsVal != null) tvStepsVal.setText("0 steps");
             if (tvCaloriesVal != null) tvCaloriesVal.setText("0 kcal");
         }
     }
 
-    // query database records and render the 7-day visual bar chart
+    // Load the active user's recent 7-day calorie history and adjust bar heights
     private void loadWeeklyChartData() {
-        // reset all chart bars and text labels to baseline default empty state
         for (int i = 0; i < 7; i++) {
             if (dateLabels[i] != null) dateLabels[i].setText("--");
             if (valueLabels[i] != null) valueLabels[i].setText("0");
@@ -181,8 +189,9 @@ public class MainActivity extends AppCompatActivity {
                 chartBars[i].setLayoutParams(layoutParams);
             }
         }
+        avgCaloriesLabel.setText("Avg: 0 kcal");
 
-        Cursor cursor = databaseHelper.getWeeklyChartData();
+        Cursor cursor = databaseHelper.getWeeklyChartDataByUser(activeUserId);
 
         if (cursor != null && cursor.moveToFirst()) {
             int cumulativeCalories = 0;
@@ -202,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
             } while (cursor.moveToNext() && indexTracker < rowTotalCount);
             cursor.close();
 
-            // map latest records to fill up to 7 UI chart slots from right to left
+            // Display only the most recent 7 entries on the chart
             int startOffsetIndex = rowTotalCount < 7 ? 0 : rowTotalCount - 7;
             int currentChartIndex = 0;
 
@@ -217,10 +226,10 @@ public class MainActivity extends AppCompatActivity {
                     valueLabels[currentChartIndex].setText(String.valueOf(calorieVal));
                 }
 
-                // calculate dynamic bar height relative to calorie value
+                // Scale bar height proportionally with a minimum visible threshold
                 int computedBarHeightPx = (calorieVal * 75) / 500;
                 if (computedBarHeightPx < 15) {
-                    computedBarHeightPx = 15; // enforce minimum display height limit
+                    computedBarHeightPx = 15;
                 }
 
                 if (chartBars[currentChartIndex] != null) {
@@ -232,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
                 currentChartIndex++;
             }
 
-            // compute and output overall average calorie intake
             if (totalRecordsCount > 0) {
                 int meanCalories = cumulativeCalories / totalRecordsCount;
                 avgCaloriesLabel.setText("Avg: " + meanCalories + " kcal");
@@ -240,14 +248,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // helper utility to parse raw database date string into short readable month format
+    // Convert YYYY-MM-DD database date into short readable format (e.g., Nov 17)
     private String formatDateString(String rawDateString) {
         try {
             String[] segments = rawDateString.split("-");
             if (segments.length == 3) {
                 String monthCode = segments[1];
                 String dayCode = segments[2];
-                String monthAbbreviation = "";
+                String monthAbbreviation;
 
                 switch (monthCode) {
                     case "01": monthAbbreviation = "Jan"; break;
@@ -272,14 +280,14 @@ public class MainActivity extends AppCompatActivity {
         return rawDateString;
     }
 
-    // utility method to convert density-independent pixels to raw screen pixels
+    // Convert dp units to device screen pixels
     private int dpToPx(int dpValue) {
         float screenDensity = getResources().getDisplayMetrics().density;
         return Math.round((float) dpValue * screenDensity);
     }
-    //share summery button method
+
+    // Format today's stats and weekly chart data into a shareable text message
     private void shareHealthSummary() {
-        // Get today's summary values from TextViews
         TextView tvDate = findViewById(R.id.tvDateBadge);
         TextView tvWater = findViewById(R.id.tvWaterVal);
         TextView tvSteps = findViewById(R.id.tvStepsVal);
@@ -292,7 +300,6 @@ public class MainActivity extends AppCompatActivity {
         String calories = tvCalories.getText().toString().trim();
         String avgCal = tvAvgCalories.getText().toString().trim();
 
-        // Get 7-day bar chart details
         int[] dayIds = {R.id.tvDay1, R.id.tvDay2, R.id.tvDay3, R.id.tvDay4, R.id.tvDay5, R.id.tvDay6, R.id.tvDay7};
         int[] valIds = {R.id.tvVal1, R.id.tvVal2, R.id.tvVal3, R.id.tvVal4, R.id.tvVal5, R.id.tvVal6, R.id.tvVal7};
 
@@ -308,7 +315,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // Build formatted share message
         String shareMessage = "🌿 *Health Tracker Summary* (" + date + ")\n\n"
                 + "📊 *Today's Metrics:*\n"
                 + "💧 Water Intake: " + water + "\n"
@@ -318,7 +324,6 @@ public class MainActivity extends AppCompatActivity {
                 + (chartDetails.length() > 0 ? chartDetails.toString() : "No weekly records yet.\n")
                 + "\nTracked via Health Tracker App 💚";
 
-        // Open Android share sheet (WhatsApp, Messenger, etc.)
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "My Health Summary - " + date);

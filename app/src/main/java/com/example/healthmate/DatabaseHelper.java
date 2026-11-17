@@ -83,7 +83,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_USERS, null, values);
     }
 
-    // insert initial sample timeline health records for testing charts and stats
+    // insert initial sample timeline health records for demo user
     private void addDummyRecords(SQLiteDatabase db) {
         String[] timelineDates = {
                 "2026-06-01", "2026-06-02", "2026-06-03",
@@ -172,34 +172,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rows > 0;
     }
 
-    // fetch all health records ordered descending by date
-    public Cursor getAllHealthRecords() {
+    // fetch all health records for a specific user ordered descending by date
+    public Cursor getAllHealthRecordsByUser(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_RECORDS + " ORDER BY " + COL_DATE + " DESC", null);
+        return db.rawQuery("SELECT * FROM " + TABLE_RECORDS + " WHERE " + COL_REC_USER_ID + " = ? ORDER BY " + COL_DATE + " DESC", new String[]{String.valueOf(userId)});
     }
 
-    // fetch all health records ordered ascending for weekly chart rendering
-    public Cursor getWeeklyChartData() {
+    // fetch health records for a specific user ordered ascending for weekly chart rendering
+    public Cursor getWeeklyChartDataByUser(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_RECORDS + " ORDER BY " + COL_DATE + " ASC", null);
+        return db.rawQuery("SELECT * FROM " + TABLE_RECORDS + " WHERE " + COL_REC_USER_ID + " = ? ORDER BY " + COL_DATE + " ASC", new String[]{String.valueOf(userId)});
     }
 
-    // query a specific health log record by exact date string
-    public Cursor getRecordByDate(String targetDate) {
+    // query a specific user's health log record by exact date string
+    public Cursor getRecordByDateAndUser(int userId, String targetDate) {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_RECORDS + " WHERE " + COL_DATE + " = ?", new String[]{targetDate});
+        return db.rawQuery("SELECT * FROM " + TABLE_RECORDS + " WHERE " + COL_REC_USER_ID + " = ? AND " + COL_DATE + " = ?", new String[]{String.valueOf(userId), targetDate});
     }
 
-    // check if a health record already exists for the given date
-    public boolean checkRecordExistsByDate(String targetDate) {
+    // check if a health record already exists for the specific user on the given date
+    public boolean checkRecordExistsByDateAndUser(int userId, String targetDate) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_RECORDS + " WHERE " + COL_DATE + " = ?", new String[]{targetDate});
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_RECORDS + " WHERE " + COL_REC_USER_ID + " = ? AND " + COL_DATE + " = ?", new String[]{String.valueOf(userId), targetDate});
         boolean exists = cursor.getCount() > 0;
         cursor.close();
         return exists;
     }
 
-    // insert a new daily health record entry into database
+    // insert a new daily health record entry for the logged-in user
     public boolean insertHealthRecord(int userId, String date, int steps, int calories, int water) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -213,10 +213,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return insertId != -1;
     }
 
-    // fetch top 5 most recent health records for dashboard display
-    public Cursor getRecentHealthRecords() {
+    // fetch top 5 most recent health records for the specific user
+    public Cursor getRecentHealthRecordsByUser(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_RECORDS + " ORDER BY " + COL_DATE + " DESC LIMIT 5", null);
+        return db.rawQuery("SELECT * FROM " + TABLE_RECORDS + " WHERE " + COL_REC_USER_ID + " = ? ORDER BY " + COL_DATE + " DESC LIMIT 5", new String[]{String.valueOf(userId)});
     }
 
     // delete a specific health record by its primary key id

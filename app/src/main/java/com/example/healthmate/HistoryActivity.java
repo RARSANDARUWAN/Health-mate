@@ -2,6 +2,7 @@ package com.example.healthmate;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -30,7 +31,7 @@ public class HistoryActivity extends AppCompatActivity {
     private TextView tvAvgWater, tvAvgSteps, tvAvgBurned;
     private DatabaseHelper databaseHelper;
 
-    // filter toggle and search keyword states
+    private int activeUserId = -1;
     private boolean showActiveOnly = false;
     private String currentSearchKeyword = "";
 
@@ -38,6 +39,10 @@ public class HistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+
+        // retrieve active logged-in user id from session preferences
+        SharedPreferences sessionPrefs = getSharedPreferences("HealthMateSession", MODE_PRIVATE);
+        activeUserId = sessionPrefs.getInt("logged_in_user_id", -1);
 
         // initialize database helper instance
         databaseHelper = new DatabaseHelper(this);
@@ -96,6 +101,8 @@ public class HistoryActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        SharedPreferences sessionPrefs = getSharedPreferences("HealthMateSession", MODE_PRIVATE);
+        activeUserId = sessionPrefs.getInt("logged_in_user_id", -1);
         refreshHistoryList();
     }
 
@@ -133,10 +140,10 @@ public class HistoryActivity extends AppCompatActivity {
         pickerDialog.show();
     }
 
-    // fetch all records, apply filters, calculate stats, and inflate cards
+    // fetch active user records, apply filters, calculate stats, and inflate cards
     private void refreshHistoryList() {
         historyCardsContainer.removeAllViews();
-        Cursor dbCursor = databaseHelper.getAllHealthRecords();
+        Cursor dbCursor = databaseHelper.getAllHealthRecordsByUser(activeUserId);
 
         int cumulativeWater = 0, cumulativeSteps = 0, cumulativeCalories = 0, rowCounter = 0;
         LayoutInflater layoutInflater = LayoutInflater.from(this);
@@ -149,12 +156,10 @@ public class HistoryActivity extends AppCompatActivity {
                 int calorieCount = dbCursor.getInt(dbCursor.getColumnIndexOrThrow("calories"));
                 int waterVolume = dbCursor.getInt(dbCursor.getColumnIndexOrThrow("water"));
 
-                // filter records if active days filter is enabled (minimum 6000 steps)
                 if (showActiveOnly && stepCount < 6000) {
                     continue;
                 }
 
-                // filter records matching search keyword
                 if (!currentSearchKeyword.isEmpty()) {
                     String queryTerm = currentSearchKeyword.toLowerCase();
                     boolean dateMatch = recordDate.toLowerCase().contains(queryTerm);
@@ -172,7 +177,6 @@ public class HistoryActivity extends AppCompatActivity {
                 cumulativeCalories += calorieCount;
                 rowCounter++;
 
-                // inflate individual history card layout item
                 View cardInstance = layoutInflater.inflate(R.layout.item_history_card, historyCardsContainer, false);
 
                 TextView tvDateDisplay = cardInstance.findViewById(R.id.tvLogDate);
@@ -188,7 +192,6 @@ public class HistoryActivity extends AppCompatActivity {
                 tvStepsDisplay.setText(String.format(Locale.getDefault(), "%,d", stepCount));
                 tvCaloriesDisplay.setText(calorieCount + " kcal");
 
-                // update goal completion badge status
                 if (stepCount >= 6000) {
                     tvStatusIndicator.setText("✓ Goal Met");
                     tvStatusIndicator.setTextColor(getResources().getColor(android.R.color.holo_green_light));
@@ -197,7 +200,6 @@ public class HistoryActivity extends AppCompatActivity {
                     tvStatusIndicator.setTextColor(getResources().getColor(android.R.color.darker_gray));
                 }
 
-                // handle item record deletion confirmation dialog
                 triggerDeleteAction.setOnClickListener(clickSource -> {
                     new AlertDialog.Builder(HistoryActivity.this)
                             .setTitle("Delete Record")
@@ -215,19 +217,16 @@ public class HistoryActivity extends AppCompatActivity {
                             .show();
                 });
 
-                // handle inline row editing mode activation
                 final boolean[] editStateFlag = {false};
                 triggerEditAction.setOnClickListener(clickSource -> {
                     if (!editStateFlag[0]) {
                         editStateFlag[0] = true;
-                        triggerEditAction.setAlpha(0.5f); // dim edit icon to denote active state
+                        triggerEditAction.setAlpha(0.5f);
 
-                        // swap textviews with editable input fields
                         EditText editableWaterField = convertTextToInput(tvWaterDisplay, String.valueOf(waterVolume));
                         EditText editableStepsField = convertTextToInput(tvStepsDisplay, String.valueOf(stepCount));
                         EditText editableCaloriesField = convertTextToInput(tvCaloriesDisplay, String.valueOf(calorieCount));
 
-                        // create temporary inline save action button
                         LinearLayout headerLayoutParent = (LinearLayout) tvDateDisplay.getParent();
                         Button saveActionButton = new Button(HistoryActivity.this);
                         saveActionButton.setText("Save");
@@ -242,7 +241,6 @@ public class HistoryActivity extends AppCompatActivity {
 
                         headerLayoutParent.addView(saveActionButton, headerLayoutParent.indexOfChild(triggerEditAction) + 1);
 
-                        // handle save button database update action
                         saveActionButton.setOnClickListener(innerClick -> {
                             String updatedWaterText = editableWaterField.getText().toString().trim();
                             String updatedStepsText = editableStepsField.getText().toString().trim();
@@ -274,7 +272,6 @@ public class HistoryActivity extends AppCompatActivity {
             dbCursor.close();
         }
 
-        // compute and update statistics summary averages
         if (rowCounter > 0) {
             tvAvgWater.setText((cumulativeWater / rowCounter) + " ml");
             tvAvgSteps.setText(String.format(Locale.getDefault(), "%,d", (cumulativeSteps / rowCounter)));
@@ -286,7 +283,7 @@ public class HistoryActivity extends AppCompatActivity {
         }
     }
 
-    // helper utility to dynamically substitute a textview with an editable text input view
+    // dynamically substitute a textview with an editable text input view
     private EditText convertTextToInput(TextView targetView, String initialValueText) {
         LinearLayout containerParent = (LinearLayout) targetView.getParent();
         int targetPosition = containerParent.indexOfChild(targetView);
