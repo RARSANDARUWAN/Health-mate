@@ -103,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
                     })
                     .show();
         });
+    //Share summery btn
+        Button btnShareSummary = findViewById(R.id.btnShareSummary);
+
+        btnShareSummary.setOnClickListener(v -> shareHealthSummary());
 
     }
 
@@ -272,5 +276,53 @@ public class MainActivity extends AppCompatActivity {
     private int dpToPx(int dpValue) {
         float screenDensity = getResources().getDisplayMetrics().density;
         return Math.round((float) dpValue * screenDensity);
+    }
+    //share summery button method
+    private void shareHealthSummary() {
+        // Get today's summary values from TextViews
+        TextView tvDate = findViewById(R.id.tvDateBadge);
+        TextView tvWater = findViewById(R.id.tvWaterVal);
+        TextView tvSteps = findViewById(R.id.tvStepsVal);
+        TextView tvCalories = findViewById(R.id.tvCaloriesVal);
+        TextView tvAvgCalories = findViewById(R.id.tvAvgCalories);
+
+        String date = tvDate.getText().toString().replace("•", "").trim();
+        String water = tvWater.getText().toString().trim();
+        String steps = tvSteps.getText().toString().trim();
+        String calories = tvCalories.getText().toString().trim();
+        String avgCal = tvAvgCalories.getText().toString().trim();
+
+        // Get 7-day bar chart details
+        int[] dayIds = {R.id.tvDay1, R.id.tvDay2, R.id.tvDay3, R.id.tvDay4, R.id.tvDay5, R.id.tvDay6, R.id.tvDay7};
+        int[] valIds = {R.id.tvVal1, R.id.tvVal2, R.id.tvVal3, R.id.tvVal4, R.id.tvVal5, R.id.tvVal6, R.id.tvVal7};
+
+        StringBuilder chartDetails = new StringBuilder();
+        for (int i = 0; i < 7; i++) {
+            TextView tvDay = findViewById(dayIds[i]);
+            TextView tvVal = findViewById(valIds[i]);
+            String dayName = tvDay.getText().toString().trim();
+            String calVal = tvVal.getText().toString().trim();
+
+            if (!dayName.equals("--")) {
+                chartDetails.append("• ").append(dayName).append(": ").append(calVal).append(" kcal\n");
+            }
+        }
+
+        // Build formatted share message
+        String shareMessage = "🌿 *Health Tracker Summary* (" + date + ")\n\n"
+                + "📊 *Today's Metrics:*\n"
+                + "💧 Water Intake: " + water + "\n"
+                + "👟 Steps Walked: " + steps + "\n"
+                + "🔥 Calories Burned: " + calories + "\n\n"
+                + "📈 *Weekly Calorie History* (" + avgCal + "):\n"
+                + (chartDetails.length() > 0 ? chartDetails.toString() : "No weekly records yet.\n")
+                + "\nTracked via Health Tracker App 💚";
+
+        // Open Android share sheet (WhatsApp, Messenger, etc.)
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "My Health Summary - " + date);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+        startActivity(Intent.createChooser(shareIntent, "Share Health Summary via"));
     }
 }
